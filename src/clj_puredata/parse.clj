@@ -151,13 +151,13 @@
        (sort-by :id)
        (sort-by (comp :id :from-node))))
 
-(defmacro parse [form]
+(defn parse [form]
   "A macro that delays any evaluations until the patch context is setup."
-  `(do (setup-parse-context)
-       (parse-element ~form)
-       (let [patch# (sort-patch (:patch @parse-context))]
-         (teardown-parse-context)
-         patch#)))
+  (setup-parse-context)
+  (parse-element form)
+  (let [patch (sort-patch (:patch @parse-context))]
+    (teardown-parse-context)
+    patch))
 
 (t/deftest parser
   (t/testing "Parsing"
