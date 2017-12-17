@@ -159,7 +159,7 @@
     (teardown-parse-context)
     patch))
 
-(t/deftest parser
+(t/deftest basic
   (t/testing "Parsing"
     (t/testing "a simple form."
       (t/is (= (parse [:+ 1 2])
@@ -202,3 +202,17 @@
                  :from-node {:id 1 :outlet 1}
                  :to-node {:id 0 :inlet 0}}])))))
 
+(t/deftest tricky
+  (t/testing "Tricky parsing"
+    (t/testing "accomodates the use of LET."
+      (t/is (= (parse (let [x [:* 2 2]] [:+ x x]))
+               [{:type ::node :op "+" :id 0
+                 :options {} :args []}
+                {:type ::node :op "*" :id 1
+                 :options {} :args [2 2]}
+                {:type ::connection
+                 :from-node {:id 1 :outlet 0}
+                 :to-node {:id 0 :inlet 0}}
+                {:type ::connection
+                 :from-node {:id 1 :outlet 0}
+                 :to-node {:id 0 :inlet 1}}])))))
