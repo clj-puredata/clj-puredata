@@ -215,4 +215,9 @@
                  :to-node {:id 0 :inlet 0}}
                 {:type ::connection
                  :from-node {:id 1 :outlet 0}
-                 :to-node {:id 0 :inlet 1}}])))))
+                 :to-node {:id 0 :inlet 1}}])
+            "This might be a bit motivated - does this require a macro that walks the form, distinguishing hiccup and regular clojure? ")
+      (t/is (= (pd-patch
+                (let [x (pd [:* 2 2])]
+                  (pd [:+ x x]))))
+            "This seems more practical - #'pd returns a map (still using unique ids for nodes), constructs a tree with duplicates, and sort them out later."))))
