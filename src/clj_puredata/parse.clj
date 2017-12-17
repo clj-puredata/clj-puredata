@@ -51,8 +51,7 @@
 
 (defn add-element [e]
   "Add NODE to the current PARSE-CONTEXT."
-  (swap! parse-context update :patch conj
-         e)
+  (swap! parse-context update :patch conj e)
   e)
 
 (defn dispense-node-id []
@@ -80,23 +79,12 @@
   (and (map? arg)
        (= (:type arg) ::node)))
 
-#_(defn parse-node-filter [form
-                         caller-id
-                         caller-inlet]
-  (as-> form %
-    (parse-element %)
-    (if (node? %)
-      (do (add-element {:type ::connection
-                        :from {:id (:id node)
-                               :outlet 0}
-                        :to {:id caller-id
-                             :inlet caller-inlet}}))
-      %)))
+(declare parse-element)
 
 (defn recur-on-node-args [args id inlet & {:keys [acc] :or {acc []}}]
-  "Makes sure that literal arguments are passed verbatim while those
-  of type ::node and ::outlet will only create a new connection to the
-  correct inlet."
+  "Makes sure that literal arguments (to nodes) are passed verbatim
+  while those of type ::node and ::outlet will create a new connection
+  to the correct inlet."
   (if (empty? args)
     acc
     (let [arg (parse-element (first args))]
@@ -129,10 +117,15 @@
     ;;
     (literal? form) form))
 
+(defn sort-patch [patch]
+  (->> patch
+       (sort-by :id)
+       (sort-by (comp :id :from-node))))
+
 (defn parse [form]
   (setup-parse-context)
   (parse-element form)
-  (let [patch (:patch @parse-context)]
+  (let [patch (sort-patch (:patch @parse-context))]
     (teardown-parse-context)
     patch))
 
@@ -142,12 +135,13 @@
              [{:type ::node :op "+" :id 0
                :options {} :args [1 2]}])))
   (t/testing "recursion"
-    (t/is (every? (into #{} (parse [:+ [:* 2 2] 1]))
-                  [{:type ::node :op "+" :id 0
-                    :options {} :args [1]}
-                   {:type ::node :op "*" :id 1
-                    :options {} :args [2 2]}
-                   {:type ::connection
-                    :from-node {:id 1 :outlet 0}
-                    :to-node {:id 0 :inlet 0}}]))))
+    (t/is (= (parse [:+ [:* 2 2] 1])
+             [{:type ::node :op "+" :id 0
+               :options {} :args [1]}
+              {:type ::node :op "*" :id 1
+               :options {} :args [2 2]}
+              {:type ::connection
+               :from-node {:id 1 :outlet 0}
+               :to-node {:id 0 :inlet 0}}])))
+  #_(t/testing "outlets"))
 
