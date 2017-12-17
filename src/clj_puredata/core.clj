@@ -17,17 +17,21 @@
 (defn open-pd []
   (reset! pd-process (future (sh "pd" "resources/reload-patch.pd"))))
 
-(defn reload-patch [patch-file]
-  (let [file (clojure.java.io/file patch-file)
+(defn reload-patch [patch-file-name]
+  (let [file (clojure.java.io/file patch-file-name)
         file-name (.getName file)
         dir (.getAbsolutePath (.getParentFile file))]
     (send-to-pd "/reload" file-name dir)))
 
 (comment
-  (open-pd)
-  (send-to-pd "/reload" "hello-world.pd" "/home/philipp/clojure/clj-puredata/resources/"))
+  (do
+    (open-pd)
+    (Thread/sleep 2000)
+    (reload-patch "resources/hello-world.pd")))
 
 (defn -main
-  "I don't do a whole lot ... yet."
   [& args]
-  (println "Hello, World!"))
+  ;;(println "Hello, World!")
+  (open-pd)
+  (Thread/sleep 2000)
+  (reload-patch "resources/hello-world.pd")) 
