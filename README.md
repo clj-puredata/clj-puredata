@@ -24,9 +24,13 @@ FIXME: listing of options this app accepts.
 
 ...
 
-### Any Other Sections
-### That You Think
-### Might be Useful
+### Roadmap
+
+- [x] 0: live reloading of newly generated patches into PureData
+- [ ] 1: parsing hiccup syntax.
+  `[:+ [:* 2 2] 1]` should create 2 nodes and 1 connection.
+  `(let [add (parse [:+ 1 2])] [:- add add])` should correctly refer to the same `add` node within the `[:- ...]` form.
+- [ ] 2: writing of PureData patch format.
 
 ## License
 
