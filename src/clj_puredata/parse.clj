@@ -83,8 +83,8 @@
 
 (defn recur-on-node-args [args id inlet & {:keys [acc] :or {acc []}}]
   "Makes sure that literal arguments (to nodes) are passed verbatim
-  while those of type ::node and ::outlet will create a new connection
-  to the correct inlet."
+  while those of type ::node, ::outlet and ::inlet will create a new
+  connection to the correct inlet."
   (if (empty? args)
     acc
     (let [arg (parse-element (first args))]
@@ -98,6 +98,9 @@
         ;;
         ;; (outlet? ... ) -> same as above
         ;;
+        (nil? arg) ; explicit NIL argument skips an inlet
+        (recur-on-node-args (rest args) id (inc inlet)
+                            :acc acc)
         :else
         (recur-on-node-args (rest args) id inlet
                             :acc (conj acc arg))))))
@@ -115,7 +118,8 @@
           node {:type ::node :op op :id id :options options :args parsed-args}]
       (add-element node))
     ;;
-    (literal? form) form))
+    (literal? form)
+    form))
 
 (defn sort-patch [patch]
   (->> patch
@@ -130,18 +134,27 @@
     patch))
 
 (t/deftest parser
-  (t/testing "simple forms"
-    (t/is (= (parse [:+ 1 2])
-             [{:type ::node :op "+" :id 0
-               :options {} :args [1 2]}])))
-  (t/testing "recursion"
-    (t/is (= (parse [:+ [:* 2 2] 1])
-             [{:type ::node :op "+" :id 0
-               :options {} :args [1]}
-              {:type ::node :op "*" :id 1
-               :options {} :args [2 2]}
-              {:type ::connection
-               :from-node {:id 1 :outlet 0}
-               :to-node {:id 0 :inlet 0}}])))
-  #_(t/testing "outlets"))
+  (t/testing "Parsing"
+    (t/testing "a simple form"
+      (t/is (= (parse [:+ 1 2])
+               [{:type ::node :op "+" :id 0
+                 :options {} :args [1 2]}])))
+    (t/testing "recursively, which triggers connections"
+      (t/is (= (parse [:+ [:* 2 2] 1])
+               [{:type ::node :op "+" :id 0
+                 :options {} :args [1]}
+                {:type ::node :op "*" :id 1
+                 :options {} :args [2 2]}
+                {:type ::connection
+                 :from-node {:id 1 :outlet 0}
+                 :to-node {:id 0 :inlet 0}}])))
+    (t/testing "will skip inlet when argument is NIL"
+      (t/is (= (parse [:+ nil [:*]])
+               [{:type ::node :op "+" :id 0
+                 :options {} :args []}
+                {:type ::node :op "*" :id 1
+                 :options {} :args []}
+                {:type ::connection
+                 :from-node {:id 1 :outlet 0}
+                 :to-node {:id 0 :inlet 1}}])))))
 
