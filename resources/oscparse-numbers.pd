@@ -1,0 +1,43 @@
+#N canvas 0 82 676 520 10;
+#X obj 91 132 for-each;
+#X text 201 186 check wether symol is number -> all chars are numbres
+, f 29;
+#X obj 91 163 t a a, f 27;
+#X obj 91 187 symbol-to-float;
+#X obj 91 217 select 1;
+#X obj 91 244 float, f 15;
+#X obj 217 220 select 0;
+#X obj 217 245 symbol;
+#X text 160 131 each item in osc-message;
+#X obj 170 350 list append;
+#X obj 31 362 list;
+#X obj 31 62 t b a b, f 25;
+#X obj 125 325 list prepend;
+#X text 290 225 if symbol can be translated to number \, do so \; bypass
+otherwise.;
+#X obj 31 25 inlet;
+#X obj 31 384 outlet;
+#X text 117 263 numbers;
+#X text 228 265 symbols;
+#X text 246 337 collect;
+#X text 289 23 work around a bug in `oscparse` (in Pd 0.47.1) that
+does not recognize numbers in osc-messages (e.g. the "i" tag). this
+patch translates any number strings it finds into Pd floats.;
+#X connect 0 0 2 0;
+#X connect 2 0 3 0;
+#X connect 2 1 7 1;
+#X connect 3 0 4 0;
+#X connect 3 0 6 0;
+#X connect 3 1 5 1;
+#X connect 4 0 5 0;
+#X connect 5 0 12 0;
+#X connect 6 0 7 0;
+#X connect 7 0 12 0;
+#X connect 9 0 12 1;
+#X connect 10 0 15 0;
+#X connect 11 0 10 0;
+#X connect 11 1 0 0;
+#X connect 11 2 12 1;
+#X connect 12 0 9 0;
+#X connect 12 0 10 1;
+#X connect 14 0 11 0;
