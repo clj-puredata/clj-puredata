@@ -44,7 +44,8 @@
 
 (defn setup-parse-context []
   (reset! parse-context {:current-node-id 0
-                         :patch []}))
+                         :patch []
+                         :processed-node-ids #{}}))
 
 (defn teardown-parse-context []
   (reset! parse-context nil))
@@ -160,6 +161,26 @@
 
 ;; --------------------------------------------------------------------------------
 
+(defn processed? [node]
+  ((:processed-node-ids @parse-context) (:id node)))
+
+(defn walk-tree
+  ([node parent inlet]
+   (add-element {:type ::connection
+                 :from-node {:id (:id node)
+                             :outlet (:outlet node 0)}
+                 :to-node {:id parent
+                           :inlet (:inlet node inlet)}})
+   (walk-tree node))
+  ([node]
+   (when (not (processed? node))
+     (add-element (update node :args (comp vec (partial remove node?))))
+     (swap! parse-context update :processed-node-ids conj (:id node)))
+   (let [connected-nodes (filter node? (:args node))]
+     (when (not (empty? connected-nodes))
+       (doall (map-indexed (fn [i c] (walk-tree c (:id node) i))
+                           connected-nodes))))))
+
 (defn pd [form]
   (cond
     (hiccup? form)
@@ -172,17 +193,11 @@
           id (dispense-node-id)
           parsed-args (mapv pd args) ;;(recur-on-node-args args id 0)
           node {:type ::node :op op :id id :options options :args parsed-args}]
-      ;;(add-element node)
       node)
     ;;
-    (literal? form)
-    form
-    ;;
-    (node? form)
-    form
-    ;;
-    (fn? form)
-    (form)))
+    (literal? form) form
+    (node? form) form
+    (fn? form) (form)))
 
 (defmacro with-patch [options & rest]
   (let [forms (if (map? options)
@@ -190,6 +205,9 @@
                 (conj rest options))]
     `(do
        (setup-parse-context)
-       (let [patch# (vector ~@forms)]
-         (teardown-parse-context)
-         patch#))))
+       (let [nodes# (vector ~@forms)]
+         (walk-tree nodes#)
+         (let [patch# (:patch @parse-context)]
+           (clojure.pprint/pprint @parse-context)
+           (teardown-parse-context)
+           [nodes# patch#])))))
