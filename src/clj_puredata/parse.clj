@@ -55,9 +55,10 @@
   e)
 
 (defn dispense-node-id []
-  (let [id (:current-node-id @parse-context)]
-    (swap! parse-context update :current-node-id inc)
-    id))
+  (if-let [id (:current-node-id @parse-context)]
+    (do (swap! parse-context update :current-node-id inc)
+        id)
+    -1))
 
 (defn op-from-kw [op-kw]
   "Keyword -> string, e.g. :+ -> \"+\"."
@@ -153,6 +154,36 @@
   "A macro that delays any evaluations until the patch context is setup."
   (setup-parse-context)
   (parse-element form)
-  (let [patch (sort-patch (:patch @parse-context))]
+  (let [patch (vec (sort-patch (:patch @parse-context)))]
     (teardown-parse-context)
     patch))
+
+;; --------------------------------------------------------------------------------
+
+(defn pd [form]
+  (cond
+    (hiccup? form)
+    (let [op (first form)
+          [options args] (if (and (map? (second form))
+                                  (not (node? (second form))))
+                           [(second form) (drop 2 form)]
+                           [{} (rest form)])
+          op (op-from-kw (first form))
+          id (dispense-node-id)
+          parsed-args (mapv pd args) ;;(recur-on-node-args args id 0)
+          node {:type ::node :op op :id id :options options :args parsed-args}]
+      ;;(add-element node)
+      node)
+    ;;
+    (literal? form)
+    form
+    ;;
+    (fn? form)
+    (form)))
+
+(defmacro with-patch [form]
+  `(do
+     (setup-parse-context)
+     (let [patch# ~form]
+       (teardown-parse-context)
+       patch#)))
