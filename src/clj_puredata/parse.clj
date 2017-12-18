@@ -178,12 +178,18 @@
     (literal? form)
     form
     ;;
+    (node? form)
+    form
+    ;;
     (fn? form)
     (form)))
 
-(defmacro with-patch [form]
-  `(do
-     (setup-parse-context)
-     (let [patch# ~form]
-       (teardown-parse-context)
-       patch#)))
+(defmacro with-patch [options & rest]
+  (let [forms (if (map? options)
+                rest
+                (conj rest options))]
+    `(do
+       (setup-parse-context)
+       (let [patch# (vector ~@forms)]
+         (teardown-parse-context)
+         patch#))))

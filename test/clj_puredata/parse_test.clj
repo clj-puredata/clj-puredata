@@ -65,7 +65,7 @@
                   (pd [:+ x x]))))
             "This seems more practical - #'pd returns a map (still using unique ids for nodes), constructs a tree with duplicates, and sort them out later."))))
 
-(deftest tree-stage
+(deftest construct-tree
   (testing "The function PD"
     (testing "will expand hiccup [:+ 1 2] to maps {:type ::node ...}."
       (is (= (pd [:+ 1 2 3])
@@ -87,18 +87,30 @@
                                  1]})))
     (testing "will assign indices when wrapped in #'WITH-PATCH."
       (is (= (with-patch (pd [:+ 1 2 3]))
-             {:type :clj-puredata.parse/node
-              :op "+" :id 0
-              :options {} :args [1 2 3]})))
+             [{:type :clj-puredata.parse/node
+               :op "+" :id 0
+               :options {} :args [1 2 3]}])))
     (testing "will assign indices recursively (depth-first, in left-to-right argument order)"
       (is (= (with-patch (pd [:+ [:- [:*]] [:/]]))
-             {:type :clj-puredata.parse/node
-              :op "+" :id 0
-              :options {} :args [{:type :clj-puredata.parse/node
-                                  :op "-" :id 1
-                                  :options {} :args [{:type :clj-puredata.parse/node
-                                                      :op "*" :id 2
-                                                      :options {} :args []}]}
-                                 {:type :clj-puredata.parse/node
-                                  :op "/" :id 3
-                                  :options {} :args []}]})))))
+             [{:type :clj-puredata.parse/node
+               :op "+" :id 0
+               :options {} :args [{:type :clj-puredata.parse/node
+                                   :op "-" :id 1
+                                   :options {} :args [{:type :clj-puredata.parse/node
+                                                       :op "*" :id 2
+                                                       :options {} :args []}]}
+                                  {:type :clj-puredata.parse/node
+                                   :op "/" :id 3
+                                   :options {} :args []}]}])))
+    (testing "intentionally preserves the indices of duplicate nodes in tree."
+      (is (= (with-patch
+               (let [x (pd [:+])]
+                 (pd [:* x x])))
+             [{:type :clj-puredata.parse/node
+               :op "*" :id 1
+               :options {} :args [{:type :clj-puredata.parse/node :op "+" :id 0 :options {} :args []}
+                                  {:type :clj-puredata.parse/node :op "+" :id 0 :options {} :args []}]}])))))
+
+#_(deftest walk-tree
+  (testing "The function WALK-TREE"
+    (testing "")))
