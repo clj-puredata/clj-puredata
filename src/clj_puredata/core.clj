@@ -2,7 +2,7 @@
   (:require [overtone.osc :refer [osc-client
                                   osc-send]]
             [clojure.java.shell :refer [sh]]
-            [java.file.io :as io])
+            [clojure.java.io :as io])
   (:gen-class))
 
 (defonce pd-osc-client (osc-client "localhost" 5000))
