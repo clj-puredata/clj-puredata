@@ -113,15 +113,13 @@
                                 (inc inlet)
                                 :acc acc))
         ;;
-        ;; (outlet? ... ) -> same as above
-        ;;
-        (nil? arg)              ; explicit NIL argument skips an inlet
+        (nil? arg)             ; explicit NIL argument skips an inlet.
         (recur-on-node-args (rest args)
                             id
                             (inc inlet)
                             :acc acc)
         ;;
-        :else
+        :else                 ; literals are added to argument vector.
         (recur-on-node-args (rest args)
                             id
                             inlet
