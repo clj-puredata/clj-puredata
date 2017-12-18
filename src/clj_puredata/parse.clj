@@ -84,13 +84,13 @@
 
 (declare parse-element)
 
-(defn outlet [node n]
+(defn outlet-old [node n]
   "assoc an :outlet key into a node. this only touches nodes as they
   are passed on through #'parse-element / #'recur-on-node-args and
   does not mutate the node stored inside the patch."
   #(assoc (parse-element node) :outlet n))
 
-(defn inlet [node n]
+(defn inlet-old [node n]
   "assoc an :inlet key into a node. this only touches nodes as they
   are passed on through #'parse-element / #'recur-on-node-args and
   does not mutate the node stored inside the patch."
@@ -165,6 +165,16 @@
 (defn processed? [node]
   ((:processed-node-ids @parse-context) (:id node)))
 
+
+(defn outlet [node n]
+  (assoc node :outlet n))
+
+(defn inlet [node n]
+  (assoc node :inlet n))
+
+(defn node-or-explicit-skip? [x]
+  (or (node? x) (nil? x)))
+
 (defn walk-tree
   ([node parent inlet]
    (add-element {:type ::connection
@@ -177,9 +187,9 @@
    (when (not (processed? node))
      (add-element (update node :args (comp vec (partial remove node?))))
      (swap! parse-context update :processed-node-ids conj (:id node)))
-   (let [connected-nodes (filter #(or (nil? %) (node? %)) (:args node))]
+   (let [connected-nodes (filter node-or-explicit-skip? (:args node))]
      (when (not (empty? connected-nodes))
-       (doall (map-indexed (fn [i c] (when (some? c) (walk-tree c (:id node) i)))
+       (doall (map-indexed (fn [i c] (when (node? c) (walk-tree c (:id node) i)))
                            connected-nodes))))))
 
 (defn pd [form]
@@ -209,7 +219,7 @@
        (let [nodes# (vector ~@forms)]
          (doall (map walk-tree nodes#))
          (let [patch# (sort-patch (:patch @parse-context))]
-           (clojure.pprint/pprint @parse-context)
+           ;; (clojure.pprint/pprint @parse-context)
            (teardown-parse-context)
            {:nodes nodes#
             :patch patch#})))))

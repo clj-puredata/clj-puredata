@@ -27,7 +27,7 @@
                :from-node {:id 1 :outlet 0}
                :to-node {:id 0 :inlet 1}}])))
     (testing "can adjust target inlet."
-      (is (= (parse [:+ (inlet [:*] 1)])
+      (is (= (parse [:+ (inlet-old [:*] 1)])
              [{:type :clj-puredata.parse/node :op "+" :id 0
                :options {} :args []}
               {:type :clj-puredata.parse/node :op "*" :id 1
@@ -36,7 +36,7 @@
                :from-node {:id 1 :outlet 0}
                :to-node {:id 0 :inlet 1}}])))
     (testing "can adjust source outlet."
-      (is (= (parse [:+ (outlet [:*] 1)])
+      (is (= (parse [:+ (outlet-old [:*] 1)])
              [{:type :clj-puredata.parse/node :op "+" :id 0
                :options {} :args []}
               {:type :clj-puredata.parse/node :op "*" :id 1
@@ -150,4 +150,8 @@
                  :options {} :args []}
                 {:type :clj-puredata.parse/connection
                  :from-node {:id 1, :outlet 0}
-                 :to-node {:id 0, :inlet 1}}])))))
+                 :to-node {:id 0, :inlet 1}}])))
+    (testing "respects the keys set by #'OUTLET and #'INLET and modifies connections accordingly."
+      (is (let [p (:patch (with-patch (pd [:+ (outlet (pd [:*]) 23) (inlet (pd [:/]) 42)])))]
+            (and (= (-> p (nth 3) :from-node :outlet) 23)
+                 (= (-> p (nth 4) :to-node :inlet) 42)))))))
