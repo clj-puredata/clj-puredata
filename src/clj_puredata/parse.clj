@@ -177,9 +177,9 @@
    (when (not (processed? node))
      (add-element (update node :args (comp vec (partial remove node?))))
      (swap! parse-context update :processed-node-ids conj (:id node)))
-   (let [connected-nodes (filter node? (:args node))]
+   (let [connected-nodes (filter #(or (nil? %) (node? %)) (:args node))]
      (when (not (empty? connected-nodes))
-       (doall (map-indexed (fn [i c] (walk-tree c (:id node) i))
+       (doall (map-indexed (fn [i c] (when (some? c) (walk-tree c (:id node) i)))
                            connected-nodes))))))
 
 (defn pd [form]
