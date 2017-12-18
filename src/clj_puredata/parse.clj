@@ -149,13 +149,14 @@
 (defn sort-patch [patch]
   (->> patch
        (sort-by :id)
-       (sort-by (comp :id :from-node))))
+       (sort-by (comp :id :from-node))
+       vec))
 
 (defn parse [form]
   "A macro that delays any evaluations until the patch context is setup."
   (setup-parse-context)
   (parse-element form)
-  (let [patch (vec (sort-patch (:patch @parse-context)))]
+  (let [patch (sort-patch (:patch @parse-context))]
     (teardown-parse-context)
     patch))
 
@@ -191,7 +192,7 @@
                            [{} (rest form)])
           op (op-from-kw (first form))
           id (dispense-node-id)
-          parsed-args (mapv pd args) ;;(recur-on-node-args args id 0)
+          parsed-args (mapv pd args)
           node {:type ::node :op op :id id :options options :args parsed-args}]
       node)
     ;;
@@ -206,8 +207,9 @@
     `(do
        (setup-parse-context)
        (let [nodes# (vector ~@forms)]
-         (walk-tree nodes#)
-         (let [patch# (:patch @parse-context)]
+         (doall (map walk-tree nodes#))
+         (let [patch# (sort-patch (:patch @parse-context))]
            (clojure.pprint/pprint @parse-context)
            (teardown-parse-context)
-           [nodes# patch#])))))
+           {:nodes nodes#
+            :patch patch#})))))
