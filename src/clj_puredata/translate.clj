@@ -15,19 +15,19 @@
 (defn merge-options [defaults n]
   (assoc n :options (merge defaults (:options n))))
 
+(defn- to-string [elm]
+  (if (coll? elm)
+    (string/join " " (map str elm))
+    (str elm)))
+
 (defn fill-template [t n]
   (->
    (string/join
     " "
     (for [lookup t]
-      (if (string? lookup)
-        lookup
-        (let [elm (cond (keyword? lookup) (or (lookup (:options n))
-                                              (lookup n))
-                        (vector? lookup) (get-in n lookup))]
-          (if (coll? elm)
-            (string/join " " (map str elm))
-            (str elm))))))
+      (cond (string? lookup) lookup
+            (keyword? lookup) (to-string (or (lookup (:options n)) (lookup n)))
+            (vector? lookup) (to-string (get-in n lookup)))))
    (str ";")))
 
 (defn translate-connection [c]
