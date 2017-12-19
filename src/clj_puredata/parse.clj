@@ -80,7 +80,7 @@
 
 (defn node? [arg]
   (and (map? arg)
-       (= (:type arg) ::node)))
+       (= (:type arg) :node)))
 
 (declare parse-element)
 
@@ -98,14 +98,14 @@
 
 (defn recur-on-node-args [args id inlet & {:keys [acc] :or {acc []}}]
   "Makes sure that literal arguments (to nodes) are passed verbatim
-  while those of type ::node, ::outlet and ::inlet will create a new
+  while those of type :node, :outlet and :inlet will create a new
   connection to the correct inlet."
   (if (empty? args)
     acc
     (let [arg (parse-element (first args))]
       (cond
         (node? arg)
-        (do (add-element {:type ::connection
+        (do (add-element {:type :connection
                           :from-node {:id (:id arg)
                                       :outlet (:outlet arg 0)} ; specified by #'outlet wrapper (of source), or default outlet (0)
                           :to-node {:id id
@@ -137,7 +137,7 @@
           op (op-from-kw (first form))
           id (dispense-node-id)
           parsed-args (recur-on-node-args args id 0)
-          node {:type ::node :op op :id id :options options :args parsed-args}]
+          node {:type :node :op op :id id :options options :args parsed-args}]
       (add-element node))
     ;;
     (literal? form)
@@ -177,7 +177,7 @@
 
 (defn walk-tree
   ([node parent inlet]
-   (add-element {:type ::connection
+   (add-element {:type :connection
                  :from-node {:id (:id node)
                              :outlet (:outlet node 0)}
                  :to-node {:id parent
@@ -203,7 +203,7 @@
           op (op-from-kw (first form))
           id (dispense-node-id)
           parsed-args (mapv pd args)
-          node {:type ::node :op op :id id :options options :args parsed-args}]
+          node {:type :node :op op :id id :options options :args parsed-args}]
       node)
     ;;
     (literal? form) form
