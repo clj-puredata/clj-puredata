@@ -22,13 +22,13 @@
                                   :op "-" :id -1
                                   :options {} :args [3 2]}
                                  1]})))
-    (testing "will assign indices when wrapped in #'WITH-PATCH."
-      (is (= (:nodes (with-patch (pd [:+ 1 2 3])))
+    (testing "will assign indices when wrapped in #'IN-CONTEXT."
+      (is (= (:nodes (in-context (pd [:+ 1 2 3])))
              [{:type :node
                :op "+" :id 0
                :options {} :args [1 2 3]}])))
     (testing "will assign indices recursively (depth-first, in left-to-right argument order)"
-      (is (= (:nodes (with-patch (pd [:+ [:- [:*]] [:/]])))
+      (is (= (:nodes (in-context (pd [:+ [:- [:*]] [:/]])))
              [{:type :node
                :op "+" :id 0
                :options {} :args [{:type :node
@@ -40,7 +40,7 @@
                                    :op "/" :id 3
                                    :options {} :args []}]}])))
     (testing "intentionally preserves the indices of duplicate nodes in tree."
-      (is (= (:nodes (with-patch
+      (is (= (:nodes (in-context
                 (let [x (pd [:+])]
                   (pd [:* x x]))))
              [{:type :node
@@ -50,19 +50,19 @@
 
 (deftest walking-the-tree
   (testing "The function WALK-TREE"
-    (testing "writes nodes out into the :PATCH field of atom PARSE-CONTEXT."
-      (is (= (-> (with-patch (pd [:+]) (pd [:-]))
-                 :patch count)
+    (testing "writes nodes out into the :LINES field of atom PARSE-CONTEXT."
+      (is (= (-> (in-context (pd [:+]) (pd [:-]))
+                 :lines count)
              2)))
     (testing "creates connections when nodes have other nodes as arguments."
-      (is (= (-> (:patch (with-patch (pd [:+ [:-]])))
+      (is (= (-> (:lines (in-context (pd [:+ [:-]])))
                  (nth 2) :type)
              :connection)))
     (testing "skips inlet if NIL is supplied as an argument."
-      (is (= (-> (:patch (with-patch (pd [:+ nil [:-]])))
+      (is (= (-> (:lines (in-context (pd [:+ nil [:-]])))
                  (nth 2) :to-node :inlet)
              1)))
     (testing "respects the keys set by #'OUTLET and #'INLET and modifies connections accordingly."
-      (is (let [p (:patch (with-patch (pd [:+ (outlet (pd [:*]) 23) (inlet (pd [:/]) 42)])))]
+      (is (let [p (:lines (in-context (pd [:+ (outlet (pd [:*]) 23) (inlet (pd [:/]) 42)])))]
             (and (= (-> p (nth 3) :from-node :outlet) 23)
                  (= (-> p (nth 4) :to-node :inlet) 42)))))))

@@ -5,7 +5,7 @@
 
 (defn setup-parse-context []
   (reset! parse-context {:current-node-id 0
-                         :patch []
+                         :lines []
                          :processed-node-ids #{}}))
 
 (defn teardown-parse-context []
@@ -13,7 +13,7 @@
 
 (defn add-element [e]
   "Add NODE to the current PARSE-CONTEXT."
-  (swap! parse-context update :patch conj e)
+  (swap! parse-context update :lines conj e)
   e)
 
 (defn dispense-node-id []
@@ -43,8 +43,8 @@
   (and (map? arg)
        (= (:type arg) :node)))
 
-(defn sort-patch [patch]
-  (->> patch
+(defn sort-lines [lines]
+  (->> lines
        (sort-by :id)
        (sort-by (comp :id :from-node))
        vec))
@@ -78,19 +78,15 @@
        (doall (map-indexed (fn [i c] (when (node? c) (walk-tree c (:id node) i)))
                            connected-nodes))))))
 
-(defmacro with-patch [options & rest]
-  (let [forms (if (map? options)
-                rest
-                (conj rest options))]
-    `(do
-       (setup-parse-context)
-       (let [nodes# (vector ~@forms)]
-         (doall (map walk-tree nodes#))
-         (let [patch# (sort-patch (:patch @parse-context))]
-           ;; (clojure.pprint/pprint @parse-context)
-           (teardown-parse-context)
-           {:nodes nodes#
-            :patch patch#})))))
+(defmacro in-context [& forms]
+  `(do
+     (setup-parse-context)
+     (let [nodes# (vector ~@forms)]
+       (doall (map walk-tree nodes#))
+       (let [lines# (sort-lines (:lines @parse-context))]
+         (teardown-parse-context)
+         {:nodes nodes#
+          :lines lines#}))))
 
 (defn pd [form]
   (cond
