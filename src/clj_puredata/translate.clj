@@ -13,7 +13,7 @@
    self-nodes ["#X" :op :x :y :args]})
 
 (def connection-template ["#X" "connect" [:from-node :id] [:from-node :outlet] [:to-node :id] [:to-node :inlet]])
-(def patch-template ["#N" "canvas" 0 0 :width :height 10])
+(def patch-template ["#N" "canvas" :x :y :width :height 10])
 
 (defn merge-options [defaults n]
   (assoc n :options (merge defaults (:options n))))
@@ -29,6 +29,7 @@
     " "
     (for [lookup t]
       (cond (string? lookup) lookup
+            (number? lookup) (str lookup)
             (keyword? lookup) (to-string (or (lookup (:options n)) (lookup n)))
             (vector? lookup) (to-string (get-in n lookup)))))
    (str ";")))
