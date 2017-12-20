@@ -78,6 +78,20 @@
        (doall (map-indexed (fn [i c] (when (node? c) (walk-tree c (:id node) i)))
                            connected-nodes))))))
 
+(defmacro with-patch [options & rest]
+  (let [forms (if (map? options)
+                rest
+                (conj rest options))]
+    `(do
+       (setup-parse-context)
+       (let [nodes# (vector ~@forms)]
+         (doall (map walk-tree nodes#))
+         (let [patch# (sort-patch (:patch @parse-context))]
+           ;; (clojure.pprint/pprint @parse-context)
+           (teardown-parse-context)
+           {:nodes nodes#
+            :patch patch#})))))
+
 (defn pd [form]
   (cond
     (hiccup? form)
@@ -95,17 +109,3 @@
     (literal? form) form
     (node? form) form
     (fn? form) (form)))
-
-(defmacro with-patch [options & rest]
-  (let [forms (if (map? options)
-                rest
-                (conj rest options))]
-    `(do
-       (setup-parse-context)
-       (let [nodes# (vector ~@forms)]
-         (doall (map walk-tree nodes#))
-         (let [patch# (sort-patch (:patch @parse-context))]
-           ;; (clojure.pprint/pprint @parse-context)
-           (teardown-parse-context)
-           {:nodes nodes#
-            :patch patch#})))))
