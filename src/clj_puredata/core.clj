@@ -2,7 +2,9 @@
   (:require [overtone.osc :refer [osc-client
                                   osc-send]]
             [clojure.java.shell :refer [sh]]
-            [clojure.java.io :as io])
+            [clojure.java.io :as io]
+            [clj-puredata.parse :refer [in-context pd]]
+            [clj-puredata.translate :refer [translate-line]])
   (:gen-class))
 
 (defonce pd-osc-client (osc-client "localhost" 5000))
@@ -23,15 +25,28 @@
         dir (.getAbsolutePath (.getParentFile file))]
     (send-to-pd "/reload" file-name dir)))
 
-(comment
-  (do
-    (open-pd)
-    (Thread/sleep 2000)
-    (reload-patch "resources/hello-world.pd")))
+(def patch-defaults
+  {:type :patch
+   :x 0
+   :y 0
+   :width 450
+   :height 300})
+
+(defmacro with-patch [name options & rest]
+  ;; TODO
+  ;; - write to file with NAME
+  ;; - use options like :graph-on-parent, :view-width, :view-height (hint: print at end of patch file)
+  ;; - trigger reload (or write dedicated WITH-LIVE-PATCH for that).
+  (let [forms (if (map? options)
+                rest
+                (conj rest options))]
+    `(let [patch# (merge patch-defaults ~options)
+           lines# (apply conj [patch#] (:lines (in-context ~@forms)))
+           out# (map translate-line lines#)]
+       out#)))
 
 (defn -main
   [& args]
-  ;;(println "Hello, World!")
-  (open-pd)
-  (Thread/sleep 2000)
-  (reload-patch "resources/hello-world.pd")) 
+  (do (open-pd)
+      (Thread/sleep 2000)
+      (reload-patch "resources/hello-world.pd"))) 
