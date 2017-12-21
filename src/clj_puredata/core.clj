@@ -33,20 +33,33 @@
    :width 450
    :height 300})
 
-(defn write-patch [file lines]
-  (spit file (string/join "\n" lines)))
+(defn wrap-lines [patch lines]
+  (let [{:keys [graph-on-parent subpatch]} patch
+        header-keys (select-keys patch [:x :y :width :height])
+        footer-keys (select-keys patch [:graph-on-parent :view-width :view-height])
+        subpatch-footer-keys (select-keys patch [:subpatch :parent-x :parent-y :name])
+        header (merge {:type :patch-header}
+                      header-keys)
+        footer-or-nil (and graph-on-parent
+                           (merge {:type :patch-footer}
+                                  footer-keys))
+        subpatch-footer-or-nil (and subpatch
+                                    (merge {:type :subpatch-footer}
+                                           subpatch-footer-keys))]
+    (remove nil? (cons header (conj lines footer-or-nil subpatch-footer-or-nil)))))
 
 (defmacro with-patch [name options & rest]
   ;; TODO
-  ;; - write to file with NAME
-  ;; - use options like :graph-on-parent, :view-width, :view-height (hint: print at end of patch file)
   ;; - trigger reload (or write dedicated WITH-LIVE-PATCH for that).
-  (let [[forms patch] (if (map? options)
-                        [rest (merge patch-defaults options)]
-                        [(conj rest options) patch-defaults])]
-    `(let [lines# (apply conj [~patch] (:lines (in-context ~@forms)))
+  (let [[patch forms] (if (map? options)
+                        [(merge patch-defaults options) rest]
+                        [patch-defaults (cons options rest)])]
+    `(let [lines# (wrap-lines ~patch (:lines (in-context ~@forms)))
            out# (map translate-line lines#)]
-       (write-patch ~name out#))))
+       out#)))
+
+(defn write-patch [file lines]
+  (spit file (string/join "\n" lines)))
 
 (defn -main
   [& args]
