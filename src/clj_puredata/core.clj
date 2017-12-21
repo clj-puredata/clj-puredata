@@ -23,7 +23,7 @@
 (defn reload-patch [patch-file-name]
   (let [file (clojure.java.io/file patch-file-name)
         file-name (.getName file)
-        dir (.getAbsolutePath (.getParentFile file))]
+        dir (.getPath (.getParentFile (.getAbsoluteFile file)))]
     (send-to-pd "/reload" file-name dir)))
 
 (def patch-defaults
