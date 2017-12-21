@@ -8,12 +8,14 @@
   {obj-nodes {:x 0 :y 0}
    self-nodes {:x 0 :y 0}})
 
-(def templates
+(def node-templates
   {obj-nodes ["#X" "obj" :x :y :op]
    self-nodes ["#X" :op :x :y :args]})
 
 (def connection-template ["#X" "connect" [:from-node :id] [:from-node :outlet] [:to-node :id] [:to-node :inlet]])
-(def patch-template ["#N" "canvas" :x :y :width :height 10])
+(def patch-header-template ["#N" "canvas" :x :y :width :height 10])
+(def patch-footer-template ["#X" "coords" "0 1 100 -1 200 140 1"]) ;; TODO figure out later
+(def subpatch-footer-template ["#X" "restore" "128 184" name]) ;; TODO figure out later
 
 (defn merge-options [defaults n]
   (assoc n :options (merge defaults (:options n))))
@@ -35,21 +37,19 @@
    (str ";")))
 
 (defn translate-node [n]
-  (loop [[k & rst] (keys templates)]
+  (loop [[k & rst] (keys node-templates)]
     (cond (nil? k) nil
           (k (:op n)) (->> n
                            (merge-options (default-options k))
-                           (fill-template (templates k)))
+                           (fill-template (node-templates k)))
           :else (recur rst))))
 
-(defn translate-connection [c]
-  (fill-template connection-template c))
-
-(defn translate-patch [p]
-  (fill-template patch-template p))
+(defn translate-any [template x] (fill-template template x))
 
 (defn translate-line [l]
   (condp (fn [te e] (= te (:type e))) l
     :node (translate-node l)
-    :connection (translate-connection l)
-    :patch (translate-patch l)))
+    :connection (translate-any connection-template l)
+    :patch-header (translate-any patch-header-template l)
+    :patch-footer (translate-any patch-footer-template l)
+    :subpatch-footer (translate-any subpatch-footer-template l)))
