@@ -3,6 +3,7 @@
                                   osc-send]]
             [clojure.java.shell :refer [sh]]
             [clojure.java.io :as io]
+            [clojure.string :as string]
             [clj-puredata.parse :refer [in-context pd]]
             [clj-puredata.translate :refer [translate-line]])
   (:gen-class))
@@ -32,18 +33,20 @@
    :width 450
    :height 300})
 
+(defn write-patch [file lines]
+  (spit file (string/join "\n" lines)))
+
 (defmacro with-patch [name options & rest]
   ;; TODO
   ;; - write to file with NAME
   ;; - use options like :graph-on-parent, :view-width, :view-height (hint: print at end of patch file)
   ;; - trigger reload (or write dedicated WITH-LIVE-PATCH for that).
-  (let [forms (if (map? options)
-                rest
-                (conj rest options))]
-    `(let [patch# (merge patch-defaults ~options)
-           lines# (apply conj [patch#] (:lines (in-context ~@forms)))
+  (let [[forms patch] (if (map? options)
+                        [rest (merge patch-defaults options)]
+                        [(conj rest options) patch-defaults])]
+    `(let [lines# (apply conj [~patch] (:lines (in-context ~@forms)))
            out# (map translate-line lines#)]
-       out#)))
+       (write-patch ~name out#))))
 
 (defn -main
   [& args]
