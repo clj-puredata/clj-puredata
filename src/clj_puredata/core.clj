@@ -4,7 +4,10 @@
             [clojure.java.shell :refer [sh]]
             [clojure.java.io :as io]
             [clojure.string :as string]
-            [clj-puredata.parse :refer [in-context pd]]
+            [clj-puredata.parse :refer [in-context
+                                        pd
+                                        inlet
+                                        outlet]]
             [clj-puredata.translate :refer [translate-line]])
   (:gen-class))
 
@@ -66,10 +69,13 @@
 (comment
   (with-patch "wobble.pd"
     {:width 800 :height 200}
-    ;; (pd ["dac~"])
-    (let [out (pd ["*~"
-                   ["osc~" 400]
-                   ["*~" ["osc~" 1/4] 0.1]])]
+    (let [gapper (fn [freq] (pd ["clip~" 0 1 ["*~" 20 ["osc~" freq]]]))
+          out (pd ["*~" 0.1
+                   ["+~"
+                    (inlet (pd ["*~" (gapper 3) ["osc~" 500]]) 0)
+                    (inlet (pd ["*~" (gapper 5) ["osc~" 400]]) 0)
+                    (inlet (pd ["*~" (gapper 7) ["osc~" 300]]) 0)
+                    (inlet (pd ["*~" (gapper 9) ["osc~" 200]]) 0)]])]
       (pd ["dac~" out out])))
   (reload-patch "wobble.pd")
   )
