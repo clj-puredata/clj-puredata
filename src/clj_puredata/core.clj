@@ -36,7 +36,9 @@
 (defn wrap-lines [patch lines]
   (let [{:keys [graph-on-parent subpatch]} patch
         header-keys (select-keys patch [:x :y :width :height])
-        footer-keys (select-keys patch [:graph-on-parent :view-width :view-height])
+        footer-keys (-> patch
+                        (select-keys [:graph-on-parent :view-width :view-height])
+                        (update :graph-on-parent (fn [bool] (if bool 1 0))))
         subpatch-footer-keys (select-keys patch [:subpatch :parent-x :parent-y :name])
         header (merge {:type :patch-header}
                       header-keys)
