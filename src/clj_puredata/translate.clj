@@ -40,7 +40,7 @@
    self-nodes {:x 0 :y 0}})
 
 (def node-templates
-  {obj-nodes ["#X" "obj" :x :y :op]
+  {obj-nodes ["#X" "obj" :x :y :op :args]
    self-nodes ["#X" :op :x :y :args]})
 
 (def connection-template ["#X" "connect" [:from-node :id] [:from-node :outlet] [:to-node :id] [:to-node :inlet]])
@@ -52,19 +52,26 @@
   (assoc n :options (merge defaults (:options n))))
 
 (defn- to-string [elm]
-  (if (coll? elm)
-    (string/join " " (map str elm))
-    (str elm)))
+  (cond
+    (coll? elm) (if (empty? elm)
+                  nil
+                  (string/join " " (map to-string elm)))
+    (number? elm) (cond
+                    (integer? elm) (str elm)
+                    (float? elm) (format "%f" elm)
+                    (rational? elm) (to-string (float elm)))
+    :else (str elm)))
 
 (defn fill-template [t n]
   (->
    (string/join
     " "
-    (for [lookup t]
-      (cond (string? lookup) lookup
-            (number? lookup) (str lookup)
-            (keyword? lookup) (to-string (or (lookup (:options n)) (lookup n)))
-            (vector? lookup) (to-string (get-in n lookup)))))
+    (remove nil?
+            (for [lookup t]
+              (cond (string? lookup) lookup
+                    (number? lookup) (str lookup)
+                    (keyword? lookup) (to-string (or (lookup (:options n)) (lookup n)))
+                    (vector? lookup) (to-string (get-in n lookup))))))
    (str ";")))
 
 (defn translate-node [n]
