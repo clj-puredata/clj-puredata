@@ -24,11 +24,14 @@
 
 (defn op-from-kw [op-kw]
   "Keyword -> string, e.g. :+ -> \"+\"."
-  (subs (str op-kw) 1))
+  (if (keyword? op-kw)
+    (subs (str op-kw) 1)
+    (str op-kw)))
 
 (defn hiccup? [form]
   (and (vector? form)
-         (keyword? (first form))))
+       (or (keyword? (first form))
+           (string? (first form)))))
 
 (defn literal? [arg]
   "Returns TRUE for numbers, strings and NIL."
@@ -91,8 +94,7 @@
 (defn pd [form]
   (cond
     (hiccup? form)
-    (let [op (first form)
-          [options args] (if (and (map? (second form))
+    (let [[options args] (if (and (map? (second form))
                                   (not (node? (second form))))
                            [(second form) (drop 2 form)]
                            [{} (rest form)])
@@ -104,4 +106,5 @@
     ;;
     (literal? form) form
     (node? form) form
-    (fn? form) (form)))
+    (fn? form) (form)
+    :else (throw (Exception. (str "Not any recognizable form: " form)))))
