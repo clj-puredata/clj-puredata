@@ -13,12 +13,12 @@
                               :op "text" :id 0
                               :options {:x 10 :y 20} :args ["hello" "world"]})
              "#X text 10 20 hello world;")))
-    (testing "does connections, too! (with TRANSLATE-CONNECTION)"
-      (is (= (translate-connection {:type :connection
+    (testing "does connections, too! (with TRANSLATE-LINE)"
+      (is (= (translate-line {:type :connection
                                     :from-node {:id 1 :outlet 2}
                                     :to-node {:id 3 :inlet 4}})
              "#X connect 1 2 3 4;")))
     (testing "dispatches accordingly (with TRANSLATE-LINE)"
       (is (re-matches #"#X connect.*" (translate-line {:type :connection})))
-      (is (re-matches #"#N canvas.*" (translate-line {:type :patch})))
+      (is (re-matches #"#N canvas.*" (translate-line {:type :patch-header})))
       (is (re-matches #"#X obj.*" (translate-line {:type :node :op "+"}))))))
