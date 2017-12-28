@@ -66,13 +66,13 @@
 (comment
   (with-patch "wobble.pd"
     {:width 800 :height 200}
-    (pd ["dac~"])
-    ;; (let [out (pd ["*~"
-    ;;                ["osc~" 400]
-    ;;                ["*~" ["osc~" 1/4] 0.1]])]
-    ;;   (pd ["dac~" out out]))
-    )
-  (reload-patch "wobble.pd"))
+    ;; (pd ["dac~"])
+    (let [out (pd ["*~"
+                   ["osc~" 400]
+                   ["*~" ["osc~" 1/4] 0.1]])]
+      (pd ["dac~" out out])))
+  (reload-patch "wobble.pd")
+  )
 
 (defn -main
   [& args]
