@@ -12,7 +12,7 @@
                  ;; -------- arrays / tables --------
                  "tabread" "tabread4" "tabwrite" "soundfiler" "table" "array"
                  ;; -------- misc --------
-                 "loadbang" "serial" "netsend" "netreceive" "qlist" "textfile" "text" "openpanel" "savepanel" "bag" "poly" "key" "keyup" "keyname" "declare"
+                 "loadbang" "serial" "netsend" "netreceive" "qlist" "textfile" "openpanel" "savepanel" "bag" "poly" "key" "keyup" "keyname" "declare"
                  ;; -------- audio math --------
                  "+~" "-~" "*~" "/~" "max~" "min~" "clip~" "q8_rsqrt~" "q8_sqrt~" "sqrt~" "wrap~" "fft~" "ifft~" "rfft~" "rifft~" "pow~" "log~" "exp~" "abs~" "framp~" "mtof~" "ftom~" "rmstodb~" "dbtorms~"
                  ;; -------- general audio manipulation --------
