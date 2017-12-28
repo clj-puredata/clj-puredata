@@ -50,6 +50,9 @@
                                            subpatch-footer-keys))]
     (remove nil? (cons header (conj lines footer-or-nil subpatch-footer-or-nil)))))
 
+(defn write-patch [file lines]
+  (spit file (string/join "\n" lines)))
+
 (defmacro with-patch [name options & rest]
   ;; TODO
   ;; - trigger reload (or write dedicated WITH-LIVE-PATCH for that).
@@ -58,10 +61,18 @@
                         [patch-defaults (cons options rest)])]
     `(let [lines# (wrap-lines ~patch (:lines (in-context ~@forms)))
            out# (map translate-line lines#)]
-       out#)))
+       (write-patch ~name out#))))
 
-(defn write-patch [file lines]
-  (spit file (string/join "\n" lines)))
+(comment
+  (with-patch "wobble.pd"
+    {:width 800 :height 200}
+    (pd ["dac~"])
+    ;; (let [out (pd ["*~"
+    ;;                ["osc~" 400]
+    ;;                ["*~" ["osc~" 1/4] 0.1]])]
+    ;;   (pd ["dac~" out out]))
+    )
+  (reload-patch "wobble.pd"))
 
 (defn -main
   [& args]
