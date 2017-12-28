@@ -74,12 +74,12 @@
    (walk-tree node))
   ([node]
    (when (not (processed? node))
+     (swap! parse-context update :processed-node-ids conj (:id node))
      (add-element (update node :args (comp vec (partial remove node?))))
-     (swap! parse-context update :processed-node-ids conj (:id node)))
-   (let [connected-nodes (filter node-or-explicit-skip? (:args node))]
-     (when (not (empty? connected-nodes))
-       (doall (map-indexed (fn [i c] (when (node? c) (walk-tree c (:id node) i)))
-                           connected-nodes))))))
+     (let [connected-nodes (filter node-or-explicit-skip? (:args node))]
+       (when (not (empty? connected-nodes))
+         (doall (map-indexed (fn [i c] (when (node? c) (walk-tree c (:id node) i)))
+                             connected-nodes)))))))
 
 (defmacro in-context [& forms]
   `(do
