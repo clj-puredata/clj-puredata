@@ -35,14 +35,22 @@
 
 (def self-nodes #{"msg" "text"})
 
+(def patch-defaults
+  ;; default :options for patch maps
+  {:type :patch
+   :x 0
+   :y 0
+   :width 450
+   :height 300})
+
 (def default-options
+  ;; default :options for node maps
   {obj-nodes {:x 0 :y 0}
    self-nodes {:x 0 :y 0}})
 
-(def node-templates
-  {obj-nodes ["#X" "obj" :x :y :op :args]
-   self-nodes ["#X" :op :x :y :args]})
-
+;; templates are used to transform clojure maps into the actual strings in a puredata file.
+(def node-templates {obj-nodes ["#X" "obj" :x :y :op :args]
+                     self-nodes ["#X" :op :x :y :args]})
 (def connection-template ["#X" "connect" [:from-node :id] [:from-node :outlet] [:to-node :id] [:to-node :inlet]])
 (def patch-header-template ["#N" "canvas" :x :y :width :height 10])
 (def patch-footer-template ["#X" "coords" "0 1 100 -1 200 140 1"]) ;; TODO figure out later
@@ -52,6 +60,7 @@
   (assoc n :options (merge defaults (:options n))))
 
 (defn- to-string [elm]
+  "Stringify literals conformant to the puredata patch format, e.g. formatting floats and rationals accordingly, TODO escaping \";\" and \"$\" characters etc."
   (cond
     (coll? elm) (if (empty? elm)
                   nil
@@ -62,7 +71,8 @@
                     (rational? elm) (to-string (float elm)))
     :else (str elm)))
 
-(defn fill-template [t n]
+(defn fill-template [t m]
+  "Use a vector T of literals and keys to construct a string representation of the map M."
   (->
    (string/join
     " "
@@ -70,11 +80,12 @@
             (for [lookup t]
               (cond (string? lookup) lookup
                     (number? lookup) (str lookup)
-                    (keyword? lookup) (to-string (or (lookup (:options n)) (lookup n)))
-                    (vector? lookup) (to-string (get-in n lookup))))))
+                    (keyword? lookup) (to-string (or (lookup (:options m)) (lookup m)))
+                    (vector? lookup) (to-string (get-in m lookup))))))
    (str ";")))
 
 (defn translate-node [n]
+  "Check for the presence of the :op of node N in the key sets of NODE-TEMPLATES, then use the corresponding template value to construct a string representation of the node."
   (loop [[k & rst] (keys node-templates)]
     (cond (nil? k) (throw (Exception. (str "Not a valid node: " n)))
           (k (:op n)) (->> n
@@ -82,12 +93,44 @@
                            (fill-template (node-templates k)))
           :else (recur rst))))
 
-(defn translate-any [template x] (fill-template template x))
+(defn translate-any [template x]
+  "Construct a string representation for any map X using TEMPLATE."
+  (fill-template template x))
 
 (defn translate-line [l]
+  "Dispatch on the :type of map L to choose a matching template for constructing its string representation."
   (condp (fn [te e] (= te (:type e))) l
-    :node (translate-node l)
-    :connection (translate-any connection-template l)
-    :patch-header (translate-any patch-header-template l)
-    :patch-footer (translate-any patch-footer-template l)
+    :node            (translate-node l)
+    :connection      (translate-any connection-template l)
+    :patch-header    (translate-any patch-header-template l)
+    :patch-footer    (translate-any patch-footer-template l)
     :subpatch-footer (translate-any subpatch-footer-template l)))
+
+(defn wrap-lines [patch lines]
+  "While nodes and connections are represented as single lines in a puredata patch file, the patch itself is defined over several lines, enclosing the other content in the form of headers and footers."
+  (let [{:keys [graph-on-parent subpatch]} patch
+        header-keys (select-keys patch [:x :y :width :height])
+        footer-keys (-> patch
+                        (select-keys [:graph-on-parent :view-width :view-height])
+                        (update :graph-on-parent (fn [bool] (if bool 1 0))))
+        subpatch-footer-keys (select-keys patch [:subpatch :parent-x :parent-y :name])
+        header (merge {:type :patch-header}
+                      header-keys)
+        footer-or-nil (and graph-on-parent
+                           (merge {:type :patch-footer}
+                                  footer-keys))
+        subpatch-footer-or-nil (and subpatch
+                                    (merge {:type :subpatch-footer}
+                                           subpatch-footer-keys))]
+    (remove nil? (cons header (conj lines footer-or-nil subpatch-footer-or-nil)))))
+
+(defn write-patch [file lines]
+  (spit file (string/join "\n" lines)))
+
+(defmacro with-patch [name options & rest]
+  (let [[patch forms] (if (map? options)
+                        [(merge patch-defaults options) rest]
+                        [patch-defaults (cons options rest)])]
+    `(let [lines# (wrap-lines ~patch (:lines (in-context ~@forms)))
+           out# (map translate-line lines#)]
+       (write-patch ~name out#))))

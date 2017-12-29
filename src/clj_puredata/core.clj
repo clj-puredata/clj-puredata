@@ -8,7 +8,8 @@
                                         pd
                                         inlet
                                         outlet]]
-            [clj-puredata.translate :refer [translate-line]])
+            [clj-puredata.translate :refer [with-patch]]
+            [vijual :as v])
   (:gen-class))
 
 (defonce pd-osc-client (osc-client "localhost" 5000))
@@ -29,42 +30,7 @@
         dir (.getPath (.getParentFile (.getAbsoluteFile file)))]
     (send-to-pd "/reload" file-name dir)))
 
-(def patch-defaults
-  {:type :patch
-   :x 0
-   :y 0
-   :width 450
-   :height 300})
 
-(defn wrap-lines [patch lines]
-  (let [{:keys [graph-on-parent subpatch]} patch
-        header-keys (select-keys patch [:x :y :width :height])
-        footer-keys (-> patch
-                        (select-keys [:graph-on-parent :view-width :view-height])
-                        (update :graph-on-parent (fn [bool] (if bool 1 0))))
-        subpatch-footer-keys (select-keys patch [:subpatch :parent-x :parent-y :name])
-        header (merge {:type :patch-header}
-                      header-keys)
-        footer-or-nil (and graph-on-parent
-                           (merge {:type :patch-footer}
-                                  footer-keys))
-        subpatch-footer-or-nil (and subpatch
-                                    (merge {:type :subpatch-footer}
-                                           subpatch-footer-keys))]
-    (remove nil? (cons header (conj lines footer-or-nil subpatch-footer-or-nil)))))
-
-(defn write-patch [file lines]
-  (spit file (string/join "\n" lines)))
-
-(defmacro with-patch [name options & rest]
-  ;; TODO
-  ;; - trigger reload (or write dedicated WITH-LIVE-PATCH for that).
-  (let [[patch forms] (if (map? options)
-                        [(merge patch-defaults options) rest]
-                        [patch-defaults (cons options rest)])]
-    `(let [lines# (wrap-lines ~patch (:lines (in-context ~@forms)))
-           out# (map translate-line lines#)]
-       (write-patch ~name out#))))
 
 (comment
   (with-patch "wobble.pd"
