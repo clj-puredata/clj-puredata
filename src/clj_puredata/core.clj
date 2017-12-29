@@ -7,7 +7,8 @@
             [clj-puredata.parse :refer [in-context
                                         pd
                                         inlet
-                                        outlet]]
+                                        outlet
+                                        other]]
             [clj-puredata.translate :refer [translate-line]])
   (:gen-class))
 
@@ -78,6 +79,13 @@
                     (inlet (pd ["*~" (gapper 9) ["osc~" 200]]) 0)]])]
       (pd ["dac~" out out])))
   (reload-patch "wobble.pd")
+  (with-patch "ref.pd"
+    {:width 800 :height 200}
+    (pd [:+ {:name 0} 1 2])
+    (pd [:+ (other 0) (other 0)]))
+  (reload-patch "ref.pd")
+  (in-context (pd [:+ {:name 0} 1 2])
+              (pd [:+ (other 0) (other 0)]))
   )
 
 (defn -main
