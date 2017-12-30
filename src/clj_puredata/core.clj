@@ -48,6 +48,7 @@
   ;;
   (with-patch "wobble2.pd"
     {:width 800 :height 800}
+    (pd [:inlet {:x 0 :y 500}])
     (let [gapper (fn [freq] (pd ["clip~" 0 1 ["*~" 20 ["osc~" freq]]]))]
       (pd ["*~" {:name "out"} 0.1
            ["+~"
@@ -55,8 +56,7 @@
             (inlet (pd ["*~" (gapper 5) ["osc~" 400]]) 0)
             (inlet (pd ["*~" (gapper 7) ["osc~" 300]]) 0)
             (inlet (pd ["*~" (gapper 9) ["osc~" 200]]) 0)]]))
-    (pd ["dac~" (other "out") (other "out")])
-    (pd [:inlet {:x 0 :y 500}]))
+    (pd ["dac~" (other "out") (other "out")])) ;; using OTHER, you can reduce the number of LETs in your code.
   (reload-patch "wobble2.pd")
   ;;
   (in-context (pd [:+ {:name 0} 1 2])
