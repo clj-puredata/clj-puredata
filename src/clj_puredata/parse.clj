@@ -51,10 +51,11 @@
   (if (node? line)
     (let [fac 60
           pos (first (filter #(= (str (:id line)) (:text %)) layout))]
-      (when pos
+      (if pos
         (-> line
             (assoc-in [:options :x] (* fac (:x pos)))
-            (assoc-in [:options :y] (* fac (:y pos))))))
+            (assoc-in [:options :y] (* fac (:y pos))))
+        line))
     line))
 
 (defn layout-lines [lines]
