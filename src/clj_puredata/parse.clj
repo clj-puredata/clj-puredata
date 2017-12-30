@@ -34,12 +34,12 @@
   "When determining the target inlet of a connection, the source nodes argument position is consulted. An argument of NIL is interpreted as explicitly 'skipping' an inlet. Any other arguments (literals/numbers/strings) are ignored in this count."
   (or (node? x) (nil? x)))
 
-(defn- setup-parse-context []
+(defn setup-parse-context []
   (reset! parse-context {:current-node-id 0
                          :lines []
                          :processed-node-ids #{}}))
 
-(defn- teardown-parse-context []
+(defn teardown-parse-context []
   (reset! parse-context nil))
 
 (defn- add-element [e]
@@ -73,7 +73,7 @@
         line))
     line))
 
-(defn- layout-lines [lines]
+(defn layout-lines [lines]
   (let [cs (filter #(= :connection (:type %)) lines)
         es (map #(vector (get-in % [:from-node :id])
                          (get-in % [:to-node :id]))
@@ -83,7 +83,7 @@
       (mapv (partial assoc-layout (v/layout-graph v/ascii-dim es {} true))
             lines))))
 
-(defn- sort-lines [lines]
+(defn sort-lines [lines]
   (->> lines
        (sort-by :id)
        (sort-by (comp :id :from-node))
@@ -99,7 +99,7 @@
     (subs-trailing-dash (name op-kw))
     (str op-kw)))
 
-(defn- walk-tree!
+(defn walk-tree!
   "The main, recursive function responsible for adding nodes and connections to the PARSE-CONTEXT. Respects special cases for OTHER, INLET and OUTLET nodes."
   ([node parent inlet]
    ;; add a connection, then recur.

@@ -58,7 +58,7 @@
 (def patch-footer-template ["#X" "coords" "0 1 100 -1 200 140 1"]) ;; TODO figure out later
 (def subpatch-footer-template ["#X" "restore" "128 184" name]) ;; TODO figure out later
 
-(defn merge-options [defaults n]
+(defn- merge-options [defaults n]
   (assoc n :options (merge defaults (:options n))))
 
 (defn- to-string [elm]
@@ -73,7 +73,7 @@
                     (rational? elm) (to-string (float elm)))
     :else (str elm)))
 
-(defn fill-template [t m]
+(defn- fill-template [t m]
   "Use a vector T of literals and keys to construct a string representation of the map M."
   (->
    (string/join
@@ -86,7 +86,7 @@
                     (vector? lookup) (to-string (get-in m lookup))))))
    (str ";")))
 
-(defn translate-node [n]
+(defn- translate-node [n]
   "Check for the presence of the :op of node N in the key sets of NODE-TEMPLATES, then use the corresponding template value to construct a string representation of the node."
   (loop [[k & rst] (keys node-templates)]
     (cond (nil? k) (throw (Exception. (str "Not a valid node: " n)))
@@ -95,7 +95,7 @@
                            (fill-template (node-templates k)))
           :else (recur rst))))
 
-(defn translate-any [template x]
+(defn- translate-any [template x]
   "Construct a string representation for any map X using TEMPLATE."
   (fill-template template x))
 
