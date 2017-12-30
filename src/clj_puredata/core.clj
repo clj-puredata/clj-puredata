@@ -7,8 +7,9 @@
             [clj-puredata.parse :refer [in-context
                                         pd
                                         inlet
-                                        outlet]]
-            [clj-puredata.translate :refer [with-patch]] 
+                                        outlet
+                                        other]]
+            [clj-puredata.translate :refer [with-patch]])
   (:gen-class))
 
 (defonce pd-osc-client (osc-client "localhost" 5000))
@@ -31,7 +32,7 @@
 
 (comment
   (with-patch "wobble.pd"
-    {:width 800 :height 200}
+    {:width 800 :height 800}
     (let [gapper (fn [freq] (pd ["clip~" 0 1 ["*~" 20 ["osc~" freq]]]))
           out (pd ["*~" 0.1
                    ["+~"
@@ -39,16 +40,18 @@
                     (inlet (pd ["*~" (gapper 5) ["osc~" 400]]) 0)
                     (inlet (pd ["*~" (gapper 7) ["osc~" 300]]) 0)
                     (inlet (pd ["*~" (gapper 9) ["osc~" 200]]) 0)]])]
-      (pd ["dac~" out out])))
+      (pd ["dac~" out out])
+      (pd [:inlet {:x 0 :y 500}])))
   (reload-patch "wobble.pd")
+  ;;
+  (in-context (pd [:+ {:name 0} 1 2])
+              (pd [:+ (other 0) (other 0)]))
   (with-patch "ref.pd"
     {:width 800 :height 200}
     (pd [:+ {:name 0} 1 2])
     (pd [:+ (other 0) (other 0)]))
-  (reload-patch "ref.pd")
-  (in-context (pd [:+ {:name 0} 1 2])
-              (pd [:+ (other 0) (other 0)]))
-  )
+  (reload-patch "ref.pd") 
+)
 
 (defn -main
   [& args]

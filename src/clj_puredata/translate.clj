@@ -1,5 +1,6 @@
 (ns clj-puredata.translate
-  (:require [clojure.string :as string]))
+  (:require [clojure.string :as string]
+            [clj-puredata.parse :refer [in-context]]))
 
 (def obj-nodes #{;; -------- general --------
                  "bang" "b" "float" "f" "symbol" "int" "i" "send" "s" "receive" "r" "select" "route" "pack" "unpack" "trigger" "t" "spigot" "moses" "until" "print" "makefilename" "change" "swap" "value" "v" "list"

@@ -1,5 +1,6 @@
 (ns clj-puredata.parse
-  (:require [clojure.test :as t]))
+  (:require [clojure.test :as t]
+            [vijual :as v]))
 
 (def parse-context (atom nil))
 
@@ -45,6 +46,26 @@
 (defn node? [arg]
   (and (map? arg)
        (= (:type arg) :node)))
+
+(defn assoc-layout [layout line]
+  (if (node? line)
+    (let [fac 60
+          pos (first (filter #(= (str (:id line)) (:text %)) layout))]
+      (when pos
+        (-> line
+            (assoc-in [:options :x] (* fac (:x pos)))
+            (assoc-in [:options :y] (* fac (:y pos))))))
+    line))
+
+(defn layout-lines [lines]
+  (let [cs (filter #(= :connection (:type %)) lines)
+        es (map #(vector (get-in % [:from-node :id])
+                         (get-in % [:to-node :id]))
+                cs)]
+    (if (empty? es)
+      lines
+      (mapv (partial assoc-layout (v/layout-graph v/ascii-dim es {} true))
+            lines))))
 
 (defn sort-lines [lines]
   (->> lines
@@ -103,7 +124,7 @@
      (setup-parse-context)
      (let [nodes# (vector ~@forms)]
        (doall (map walk-tree nodes#))
-       (let [lines# (sort-lines (:lines @parse-context))]
+       (let [lines# (layout-lines (sort-lines (:lines @parse-context)))]
          (teardown-parse-context)
          {:nodes nodes#
           :lines lines#}))))
