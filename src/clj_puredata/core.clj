@@ -40,18 +40,41 @@
                     (inlet (pd ["*~" (gapper 5) ["osc~" 400]]) 0)
                     (inlet (pd ["*~" (gapper 7) ["osc~" 300]]) 0)
                     (inlet (pd ["*~" (gapper 9) ["osc~" 200]]) 0)]])]
-      (pd ["dac~" out out])
-      (pd [:inlet {:x 0 :y 500}])))
+      (pd ["text" "i'm ignored!"]) ;; let only returns that last value :( ...
+      (pd ["dac~" out out]))
+    (pd [:inlet {:x 0 :y 500}])
+    (pd ["text" {:y 400} "i'm in!"])) ;; ... but you can add as many forms as you like :)
   (reload-patch "wobble.pd")
+  ;;
+  (with-patch "wobble2.pd"
+    {:width 800 :height 800}
+    (let [gapper (fn [freq] (pd ["clip~" 0 1 ["*~" 20 ["osc~" freq]]]))]
+      (pd ["*~" {:name "out"} 0.1
+           ["+~"
+            (inlet (pd ["*~" (gapper 3) ["osc~" 500]]) 0)
+            (inlet (pd ["*~" (gapper 5) ["osc~" 400]]) 0)
+            (inlet (pd ["*~" (gapper 7) ["osc~" 300]]) 0)
+            (inlet (pd ["*~" (gapper 9) ["osc~" 200]]) 0)]]))
+    (pd ["dac~" (other "out") (other "out")])
+    (pd [:inlet {:x 0 :y 500}]))
+  (reload-patch "wobble2.pd")
   ;;
   (in-context (pd [:+ {:name 0} 1 2])
               (pd [:+ (other 0) (other 0)]))
   (with-patch "ref.pd"
     {:width 800 :height 200}
     (pd [:+ {:name 0} 1 2])
-    (pd [:+ (other 0) (other 0)]))
-  (reload-patch "ref.pd") 
-)
+    (pd [:+ (other 0) (other 0)])
+    (pd [:text "lol"]))
+  (reload-patch "ref.pd")
+  ;;
+  (with-patch "huh.pd"
+    {:width 800 :height 200}
+    (let [a 1]
+      (pd [:+ {:y 50} 1 2]))
+    (pd [:text "lol"]))
+  (reload-patch "huh.pd")
+  )
 
 (defn -main
   [& args]
