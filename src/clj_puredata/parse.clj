@@ -35,6 +35,10 @@
   [node]
   ((:processed-node-ids @parse-context) (:id node)))
 
+(defn- record-as-processed
+  [node]
+  (swap! parse-context update :processed-node-ids conj (:id node)))
+
 (defn- node-or-explicit-skip?
   "When determining the target inlet of a connection, the source nodes argument position is consulted.
   An argument of NIL is interpreted as explicitly 'skipping' an inlet.
@@ -50,8 +54,9 @@
 (defn teardown-parse-context []
   (reset! parse-context nil))
 
-(defn- add-element [e]
+(defn- add-element!
   "Add NODE to the current PARSE-CONTEXT."
+  [e]
   (swap! parse-context update :lines conj e)
   e)
 
@@ -71,6 +76,13 @@
     (if (nil? solve)
       (throw (Exception. (str "Cannot resolve other node " other)))
       solve)))
+
+#_(defn- resolve
+    "Resolve anything to a node, wether it already is or not."
+    [n]
+    (if (other? n)
+      (resolve-other n)
+      n))
 
 (defn- assoc-layout
   [layout line]
@@ -120,28 +132,36 @@
   [node]
   (update node :args (comp vec (partial remove node-or-explicit-skip?))))
 
+(defn- connection
+  [from-node to-id inlet]
+  {:type :connection
+   :from-node {:id (if (other? from-node)
+                     (:id (resolve-other from-node))
+                     (:id from-node))
+               :outlet (:outlet from-node 0)}
+   :to-node {:id to-id
+             :inlet (:inlet from-node inlet)}})
+
+(declare walk-tree!)
+
+(defn- walk-node-args
+  [node]
+  (let [connected-nodes (filter node-or-explicit-skip? (:args node))]
+       (when (not (empty? connected-nodes))
+         (doall (map-indexed (fn [i c] (when (node? c) (walk-tree! c (:id node) i)))
+                             connected-nodes)))))
+
 (defn walk-tree!
   "The main, recursive function responsible for adding nodes and connections to the PARSE-CONTEXT.
   Respects special cases for OTHER, INLET and OUTLET nodes."
-  ([node parent inlet]
-   ;; add a connection, then recur.
-   (add-element {:type :connection
-                 :from-node {:id (if (other? node)
-                                   (:id (resolve-other node))
-                                   (:id node))
-                             :outlet (:outlet node 0)}
-                 :to-node {:id parent
-                           :inlet (:inlet node inlet)}})
+  ([node parent-id inlet]
+   (add-element! (connection node parent-id inlet))
    (when-not (other? node) (walk-tree! node)))
   ([node]
-   ;; process node, then recur on any arguments of type node (to make connections).
    (when (not (processed? node))
-     (swap! parse-context update :processed-node-ids conj (:id node))
-     (add-element (remove-node-args node))
-     (let [connected-nodes (filter node-or-explicit-skip? (:args node))]
-       (when (not (empty? connected-nodes))
-         (doall (map-indexed (fn [i c] (when (node? c) (walk-tree! c (:id node) i)))
-                             connected-nodes)))))))
+     (record-as-processed node)
+     (add-element! (remove-node-args node))
+     (walk-node-args node))))
 
 (defmacro in-context
   "Set up fresh PARSE-CONTEXT, evaluate patch forms, return lines ready for translation."
@@ -189,3 +209,15 @@
   [name]
   {:type :node
    :other name})
+
+#_(defn connect
+    "Connect two nodes.
+  This verb is necessary because argument or OTHER nodes can only be
+  previously defined nodes. Since nodes cannot be re-defined, this is
+  the appropriate way to treat nodes that are mutually connected."
+    ;; problem: how to pass INLET and OUTLET through OTHER?
+    [to & froms]
+    (doall
+     (map-indexed (fn [i c]
+                    (add-element! (connection c (:id to) (or (:inlet to) i))))
+                  froms)))
