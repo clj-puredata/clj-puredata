@@ -61,17 +61,34 @@
 (defn inlet [node n]
   (assoc node :inlet n))
 
+(defn other [name]
+  {:type :node
+   :other name})
+
 (defn node-or-explicit-skip? [x]
   (or (node? x) (nil? x)))
+
+(defn other? [node]
+  (and (nil? (:id node))
+       (some? (:other node))))
+
+(defn resolve-other [other]
+  (let [solve (first (filter #(= (:other other) (get-in % [:options :name]))
+                             (@parse-context :lines)))]
+    (if (nil? solve)
+      (throw (Exception. (str "Cannot resolve other node " other)))
+      solve)))
 
 (defn walk-tree
   ([node parent inlet]
    (add-element {:type :connection
-                 :from-node {:id (:id node)
+                 :from-node {:id (if (other? node)
+                                   (:id (resolve-other node))
+                                   (:id node))
                              :outlet (:outlet node 0)}
                  :to-node {:id parent
                            :inlet (:inlet node inlet)}})
-   (walk-tree node))
+   (when-not (other? node) (walk-tree node)))
   ([node]
    (when (not (processed? node))
      (swap! parse-context update :processed-node-ids conj (:id node))

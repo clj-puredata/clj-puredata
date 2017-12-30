@@ -8,8 +8,7 @@
                                         pd
                                         inlet
                                         outlet]]
-            [clj-puredata.translate :refer [with-patch]]
-            [vijual :as v])
+            [clj-puredata.translate :refer [with-patch]] 
   (:gen-class))
 
 (defonce pd-osc-client (osc-client "localhost" 5000))
@@ -30,8 +29,6 @@
         dir (.getPath (.getParentFile (.getAbsoluteFile file)))]
     (send-to-pd "/reload" file-name dir)))
 
-
-
 (comment
   (with-patch "wobble.pd"
     {:width 800 :height 200}
@@ -44,6 +41,13 @@
                     (inlet (pd ["*~" (gapper 9) ["osc~" 200]]) 0)]])]
       (pd ["dac~" out out])))
   (reload-patch "wobble.pd")
+  (with-patch "ref.pd"
+    {:width 800 :height 200}
+    (pd [:+ {:name 0} 1 2])
+    (pd [:+ (other 0) (other 0)]))
+  (reload-patch "ref.pd")
+  (in-context (pd [:+ {:name 0} 1 2])
+              (pd [:+ (other 0) (other 0)]))
   )
 
 (defn -main
