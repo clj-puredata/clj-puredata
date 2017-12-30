@@ -1,6 +1,7 @@
 (ns clj-puredata.translate
   (:require [clojure.string :as string]
-            [clj-puredata.parse :refer [in-context]]))
+            [clj-puredata.parse :refer [in-context]]
+            [clj-puredata.puredata :refer [reload]]))
 
 (def obj-nodes #{;; -------- general --------
                  "bang" "b" "float" "f" "symbol" "int" "i" "send" "s" "receive" "r" "select" "route" "pack" "unpack" "trigger" "t" "spigot" "moses" "until" "print" "makefilename" "change" "swap" "value" "v" "list"
@@ -134,4 +135,5 @@
                         [patch-defaults (cons options rest)])]
     `(let [lines# (wrap-lines ~patch (:lines (in-context ~@forms)))
            out# (map translate-line lines#)]
-       (write-patch ~name out#))))
+       (write-patch ~name out#)
+       (reload))))
