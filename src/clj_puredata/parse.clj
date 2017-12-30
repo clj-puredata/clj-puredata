@@ -18,15 +18,20 @@
   e)
 
 (defn dispense-node-id []
+  "When a PARSE-CONTEXT is active, dispense one new (running) index."
   (if-let [id (:current-node-id @parse-context)]
     (do (swap! parse-context update :current-node-id inc)
         id)
     -1))
 
+(defn subs-trailing-dash [op]
+  "In strings > 1 character containing a trailing dash \"-\", substitute a tilde \"~\"."
+  (clojure.string/replace op #"^(.+)-$" "$1~"))
+
 (defn op-from-kw [op-kw]
-  "Keyword -> string, e.g. :+ -> \"+\"."
+  "Keyword -> string, e.g. :+ -> \"+\". Turns keywords containing trailing dashes into strings with trailing tildes, e.g. :osc- -> \"osc~\". Recognizes & passes strings untouched."
   (if (keyword? op-kw)
-    (subs (str op-kw) 1)
+    (subs-trailing-dash (name op-kw))
     (str op-kw)))
 
 (defn hiccup? [form]
