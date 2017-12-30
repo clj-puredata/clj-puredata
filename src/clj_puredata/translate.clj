@@ -48,7 +48,9 @@
   (assoc n :options (merge defaults (:options n))))
 
 (defn- to-string
-  "Stringify literals conformant to the puredata patch format, e.g. formatting floats and rationals accordingly, TODO escaping \";\" and \"$\" characters etc."
+  "Stringify literals conformant to the puredata patch format.
+  E.g. formatting floats and rationals accordingly, TODO escaping
+  \";\" and \"$\" characters etc."
   [elm]
   (cond
     (coll? elm) (if (empty? elm)
@@ -100,7 +102,7 @@
     :subpatch-footer (translate-any subpatch-footer-template l)))
 
 (defn wrap-lines
-  "While nodes and connections are represented as single lines in a puredata patch file, the patch itself is defined over several lines, enclosing the other content in the form of headers and footers."
+  "While nodes and connections are represented as single lines in a puredata patch file, the patch itself is defined over several lines,enclosing the other content in the form of headers and footers."
   [patch lines]
   (let [{:keys [graph-on-parent subpatch]} patch
         header-keys (select-keys patch [:x :y :width :height])
