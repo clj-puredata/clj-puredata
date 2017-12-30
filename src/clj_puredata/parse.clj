@@ -4,34 +4,42 @@
 
 (def parse-context (atom nil))
 
-(defn- hiccup? [form]
+(defn- hiccup?
+  [form]
   (and (vector? form)
        (or (keyword? (first form))
            (string? (first form)))))
 
-(defn- literal? [arg]
+(defn- literal?
   "Returns TRUE for numbers, strings and NIL."
-  (if (or (number? arg) 
+  [arg]
+  (if (or (number? arg)
           (string? arg)
           (char? arg)
           (nil? arg))
     true
     false))
 
-(defn- node? [arg]
+(defn- node?
+  [arg]
   (and (map? arg)
        (= (:type arg) :node)))
 
-(defn- other? [node]
+(defn- other?
   "See OTHER."
+  [node]
   (and (nil? (:id node))
        (some? (:other node))))
 
-(defn- processed? [node]
+(defn- processed?
+  [node]
   ((:processed-node-ids @parse-context) (:id node)))
 
-(defn- node-or-explicit-skip? [x]
-  "When determining the target inlet of a connection, the source nodes argument position is consulted. An argument of NIL is interpreted as explicitly 'skipping' an inlet. Any other arguments (literals/numbers/strings) are ignored in this count."
+(defn- node-or-explicit-skip?
+  "When determining the target inlet of a connection, the source nodes argument position is consulted.
+  An argument of NIL is interpreted as explicitly 'skipping' an inlet.
+  Any other arguments (literals/numbers/strings) are ignored in this count."
+  [x]
   (or (node? x) (nil? x)))
 
 (defn setup-parse-context []
@@ -47,22 +55,25 @@
   (swap! parse-context update :lines conj e)
   e)
 
-(defn- dispense-node-id []
+(defn- dispense-node-id
   "When a PARSE-CONTEXT is active, dispense one new (running) index."
+  []
   (if-let [id (:current-node-id @parse-context)]
     (do (swap! parse-context update :current-node-id inc)
         id)
     -1))
 
-(defn- resolve-other [other]
+(defn- resolve-other
   "Try to find the referenced node in the current PARSE-CONTEXT."
+  [other]
   (let [solve (first (filter #(= (:other other) (get-in % [:options :name]))
                              (@parse-context :lines)))]
     (if (nil? solve)
       (throw (Exception. (str "Cannot resolve other node " other)))
       solve)))
 
-(defn- assoc-layout [layout line]
+(defn- assoc-layout
+  [layout line]
   (if (node? line)
     (let [fac 60
           pos (first (filter #(= (str (:id line)) (:text %)) layout))]
@@ -73,7 +84,8 @@
         line))
     line))
 
-(defn layout-lines [lines]
+(defn layout-lines
+  [lines]
   (let [cs (filter #(= :connection (:type %)) lines)
         es (map #(vector (get-in % [:from-node :id])
                          (get-in % [:to-node :id]))
@@ -83,24 +95,34 @@
       (mapv (partial assoc-layout (v/layout-graph v/ascii-dim es {} true))
             lines))))
 
-(defn sort-lines [lines]
+(defn sort-lines
+  [lines]
   (->> lines
        (sort-by :id)
        (sort-by (comp :id :from-node))
        vec))
 
-(defn- subs-trailing-dash [op]
+(defn- subs-trailing-dash
   "In strings > 1 character containing a trailing dash \"-\", substitute a tilde \"~\"."
+  [op]
   (clojure.string/replace op #"^(.+)-$" "$1~"))
 
-(defn- op-from-kw [op-kw]
-  "Keyword -> string, e.g. :+ -> \"+\". Turns keywords containing trailing dashes into strings with trailing tildes, e.g. :osc- -> \"osc~\". Recognizes & passes strings untouched."
+(defn- op-from-kw
+  "Keyword -> string, e.g. :+ -> \"+\".
+  Turns keywords containing trailing dashes into strings with trailing tildes, e.g. :osc- -> \"osc~\".
+  Recognizes & passes strings untouched."
+  [op-kw]
   (if (keyword? op-kw)
     (subs-trailing-dash (name op-kw))
     (str op-kw)))
 
+(defn- remove-node-args
+  [node]
+  (update node :args (comp vec (partial remove node-or-explicit-skip?))))
+
 (defn walk-tree!
-  "The main, recursive function responsible for adding nodes and connections to the PARSE-CONTEXT. Respects special cases for OTHER, INLET and OUTLET nodes."
+  "The main, recursive function responsible for adding nodes and connections to the PARSE-CONTEXT.
+  Respects special cases for OTHER, INLET and OUTLET nodes."
   ([node parent inlet]
    ;; add a connection, then recur.
    (add-element {:type :connection
@@ -115,14 +137,15 @@
    ;; process node, then recur on any arguments of type node (to make connections).
    (when (not (processed? node))
      (swap! parse-context update :processed-node-ids conj (:id node))
-     (add-element (update node :args (comp vec (partial remove node?))))
+     (add-element (remove-node-args node))
      (let [connected-nodes (filter node-or-explicit-skip? (:args node))]
        (when (not (empty? connected-nodes))
          (doall (map-indexed (fn [i c] (when (node? c) (walk-tree! c (:id node) i)))
                              connected-nodes)))))))
 
-(defmacro in-context [& forms]
+(defmacro in-context
   "Set up fresh PARSE-CONTEXT, evaluate patch forms, return lines ready for translation."
+  [& forms]
   `(do
      (setup-parse-context)
      (let [nodes# (vector ~@forms)]
@@ -132,8 +155,9 @@
          {:nodes nodes#
           :lines lines#}))))
 
-(defn pd [form]
-  ""
+(defn pd
+  "Turn hiccup vectors into trees of node maps, ready to be walked by WALK-TREE!."
+  [form]
   (cond
     (hiccup? form)
     (let [[options args] (if (and (map? (second form))
@@ -145,21 +169,23 @@
           parsed-args (mapv pd args)
           node {:type :node :op op :id id :options options :args parsed-args}]
       node)
-    ;;
     (literal? form) form
     (node? form) form
     (fn? form) (form)
     :else (throw (Exception. (str "Not any recognizable form: " form)))))
-(defn outlet [node n]
+
+(defn outlet
   "Use OUTLET to specify the intended outlet of a connection, e.g. (pd [:+ (outlet (pd [:moses ...]) 1)]). The default outlet is 0."
+  [node n]
   (assoc node :outlet n))
 
-(defn inlet [node n]
+(defn inlet
   "Use INLET to specify the intended inlet for a connection, e.g. (pd [:/ 1 (inlet (pd ...) 1)]). The default inlet is determined by the source node argument position (not counting literals, only NIL and other nodes) (e.g. 0 in the previous example)."
+  [node n]
   (assoc node :inlet n))
 
-(defn other [name]
+(defn other
   "An OTHER is a special node that refers to a previously defined node with :name = NAME in its :options map. It can be used to reduce the number of LETs in patch definitions, e.g. (pd [:osc- {:name \"foo\"} 200]) (pd [:dac- (other \"foo\") (other \"foo\")])."
+  [name]
   {:type :node
    :other name})
-
