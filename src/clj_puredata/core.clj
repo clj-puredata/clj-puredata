@@ -5,7 +5,7 @@
                                         other]]
             [clj-puredata.translate :refer [with-patch]]
             [clj-puredata.puredata :refer [open-pd
-                                           load]])
+                                           load-patch]])
   (:gen-class))
 
 ;; 1 - create a basic patch using WITH-PATCH.
@@ -17,7 +17,7 @@
   ;; 2 - open PureData.
   (open-pd)
   ;; 3 - load your patch.
-  (load "test.pd")
+  (load-patch "test.pd")
   ;; 4 - now edit the original WITH-PATCH, evaluate it, and see PureData update accordingly.
   ;; 5 - rinse and repeat.
   )

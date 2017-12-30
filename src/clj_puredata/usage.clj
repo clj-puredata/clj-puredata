@@ -5,7 +5,7 @@
                                         other]]
             [clj-puredata.translate :refer [with-patch]]
             [clj-puredata.puredata :refer [open-pd
-                                           load]]))
+                                           load-patch]]))
 (comment
   (with-patch "wobble.pd"
     {:width 800 :height 800}
@@ -67,5 +67,5 @@
   )
 
 (open-pd)
-(load "clippercore.pd")
+(load-patch "clippercore.pd")
 

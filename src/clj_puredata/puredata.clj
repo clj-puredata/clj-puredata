@@ -24,11 +24,11 @@
         dir (.getPath (.getParentFile (.getAbsoluteFile file)))]
     (send-to-pd "/reload" file-name dir)))
 
-(defn load [& patch-names]
-  "Register a patch to be reloaded after _any_ WITH-PATCH is called."
-  (reset! reload-targets patch-names)
-  (reload))
-
 (defn reload []
   (doseq [p @reload-targets]
     (reload-patch p)))
+
+(defn load-patch [& patch-names]
+  "Register the patches to be reloaded after _any_ WITH-PATCH is called."
+  (reset! reload-targets patch-names)
+  (reload))
