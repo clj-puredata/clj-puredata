@@ -63,9 +63,9 @@
        (other "src")])
   (pd [:*- {:name "final"} 0.1
        [:clip- (other "tap") -1 1]])
-  (pd [:dac- (other "final") (other "final")])
-  )
+  (pd [:dac- (other "final") (other "final")]))
 
-(open-pd)
-(load-patch "clippercore.pd")
+(comment
+  (open-pd)
+  (load-patch "clippercore.pd"))
 
