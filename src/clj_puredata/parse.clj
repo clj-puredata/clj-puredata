@@ -111,8 +111,8 @@
   (if (node? line)
     (let [pos (first (filter #(= (str (:id line)) (:text %)) layout))]
       (if (and pos
-               (nil? (get-in [:options :x] line))
-               (nil? (get-in [:options :y] line)))
+               (nil? (get-in line [:options :x]))
+               (nil? (get-in line [:options :y])))
         (-> line
             (assoc-in [:options :x] (:xpos pos))
             (assoc-in [:options :y] (:ypos pos)))
