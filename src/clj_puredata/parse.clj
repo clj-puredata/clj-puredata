@@ -113,20 +113,20 @@
           pos (first (filter #(= (str (:id line)) (:text %)) layout))]
       (if pos
         (-> line
-            (assoc-in [:options :x] (* fac (:x pos)))
-            (assoc-in [:options :y] (* fac (:y pos))))
+            (assoc-in [:options :x] (:xpos pos))
+            (assoc-in [:options :y] (:ypos pos)))
         line))
     line))
 
 (defn layout-lines
   [lines]
-  (let [cs (filter #(= :connection (:type %)) lines)
-        es (map #(vector (get-in % [:from-node :id])
-                         (get-in % [:to-node :id]))
-                cs)]
-    (if (empty? es)
+  (let [connections (filter #(= :connection (:type %)) lines)
+        edges (map #(vector (get-in % [:from-node :id])
+                            (get-in % [:to-node :id]))
+                   connections)]
+    (if (empty? edges)
       lines
-      (mapv (partial assoc-layout (v/layout-graph v/ascii-dim es {} true))
+      (mapv (partial assoc-layout (v/layout-graph v/image-dim edges {} true))
             lines))))
 
 (defn sort-lines
@@ -165,7 +165,6 @@
              :inlet (:inlet from-node inlet)}})
 
 (declare walk-tree!)
-
 (defn- walk-node-args
   [node]
   (let [connected-nodes (filter node-or-explicit-skip? (:args node))]
@@ -193,7 +192,10 @@
      (let [nodes# (vector ~@forms)]
        (doall (map walk-tree! nodes#))
        (resolve-all-other!)
-       (let [lines# (layout-lines (sort-lines (:lines @parse-context)))]
+       (let [lines# (-> @parse-context
+                        :lines
+                        layout-lines
+                        sort-lines)]
          (teardown-parse-context)
          {:nodes nodes#
           :lines lines#}))))
