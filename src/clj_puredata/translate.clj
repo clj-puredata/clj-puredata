@@ -1,24 +1,27 @@
 (ns clj-puredata.translate
+  "Translate the nodes and connections of a patch into into their PureData-conformant string representation."
   (:require [clojure.string :as string]
             [clj-puredata.parse :refer [in-context]]
             [clj-puredata.puredata :refer [reload]]))
 
-(def obj-nodes #{"bang" "b" "float" "f" "symbol" "int" "i" "send" "s" "receive" "r" "select" "route" "pack" "unpack" "trigger" "t" "spigot" "moses" "until" "print" "makefilename" "change" "swap" "value" "v" "list" ; general
-                 "delay" "metro" "line" "timer" "cputime" "realtime" "pipe" ; time
-                 "+" "-" "*" "/" "pow" "==" "!=" ">" "<" ">=" "<=" "&" "&&" "||" "||||" "%" "<<" ">>" "mtof" "powtodb" "rmstodb" "ftom" "dbtopow" "dbtorms" "mod" "div" "sin" "cos" "tan" "atan" "atan2" "sqrt" "log" "exp" "abs" "random" "max" "min" "clip" "wrap" ; math
-                 "notein" "ctlin" "pgmin" "bendin" "touchin" "polytouchin" "midiin" "sysexin" "noteout" "ctlout" "pgmout" "bendout" "touchout" "polytouchout" "midiout" "makenote" "stripnote" "oscparse" "oscformat" ; midi and osc
-                 "tabread" "tabread4" "tabwrite" "soundfiler" "table" "array" ; arrays / tables
-                 "loadbang" "serial" "netsend" "netreceive" "qlist" "textfile" "openpanel" "savepanel" "bag" "poly" "key" "keyup" "keyname" "declare" ; misc
-                 "+~" "-~" "*~" "/~" "max~" "min~" "clip~" "q8_rsqrt~" "q8_sqrt~" "sqrt~" "wrap~" "fft~" "ifft~" "rfft~" "rifft~" "pow~" "log~" "exp~" "abs~" "framp~" "mtof~" "ftom~" "rmstodb~" "dbtorms~" ; audio math
-                 "dac~" "adc~" "sig~" "line~" "vline~" "threshold~" "snapshot~" "vsnapshot~" "bang~" "samplerate~" "send~" "receive~" "throw~" "catch~" "block~" "switch~" "readsf~" "writesf~" ; audio manipulation
-                 "phasor~" "cos~" "osc~" "tabwrite~" "tabplay~" "tabread~" "tabread4~" "tabosc4~" "tabsend~" "tabreceive~" ; audio oscillators and tables
-                 "vcf~" "noise~" "env~" "hip~" "lop~" "bp~" "biquad~" "samphold~" "print~" "rpole~" "rzero~" "rzero_rev~" "cpole~" "czero~" "czero_rev~" ; audio filters
-                 "delwrite~" "delread~" "vd~" ; audio delay
-                 ;; pd
-                 "inlet" "outlet" "inlet~" "outlet~" ; subwindows
-                 "struct" "drawcurve" "filledcurve" "drawpolygon" "filledpolygon" "plot" "drawnumber" ; data templates
-                 "pointer" "get" "set" "element" "getsize" "setsize" "append" "scalar" ; accessing data
-                 "sigmund~" "bonk~" "choice" "hilbert~" "complex-mod~" "expr~" "expr" "fexpr~" "loop~" "lrshift~" "pd~" "rev1~" "rev2~" "rev3~" "bob~"}) ; extras
+(def obj-nodes
+  "Set of default node types available in PureData 0.47 (Vanilla)."
+  #{"bang" "b" "float" "f" "symbol" "int" "i" "send" "s" "receive" "r" "select" "route" "pack" "unpack" "trigger" "t" "spigot" "moses" "until" "print" "makefilename" "change" "swap" "value" "v" "list" ; general
+    "delay" "metro" "line" "timer" "cputime" "realtime" "pipe" ; time
+    "+" "-" "*" "/" "pow" "==" "!=" ">" "<" ">=" "<=" "&" "&&" "||" "||||" "%" "<<" ">>" "mtof" "powtodb" "rmstodb" "ftom" "dbtopow" "dbtorms" "mod" "div" "sin" "cos" "tan" "atan" "atan2" "sqrt" "log" "exp" "abs" "random" "max" "min" "clip" "wrap" ; math
+    "notein" "ctlin" "pgmin" "bendin" "touchin" "polytouchin" "midiin" "sysexin" "noteout" "ctlout" "pgmout" "bendout" "touchout" "polytouchout" "midiout" "makenote" "stripnote" "oscparse" "oscformat" ; midi and osc
+    "tabread" "tabread4" "tabwrite" "soundfiler" "table" "array" ; arrays / tables
+    "loadbang" "serial" "netsend" "netreceive" "qlist" "textfile" "openpanel" "savepanel" "bag" "poly" "key" "keyup" "keyname" "declare" ; misc
+    "+~" "-~" "*~" "/~" "max~" "min~" "clip~" "q8_rsqrt~" "q8_sqrt~" "sqrt~" "wrap~" "fft~" "ifft~" "rfft~" "rifft~" "pow~" "log~" "exp~" "abs~" "framp~" "mtof~" "ftom~" "rmstodb~" "dbtorms~" ; audio math
+    "dac~" "adc~" "sig~" "line~" "vline~" "threshold~" "snapshot~" "vsnapshot~" "bang~" "samplerate~" "send~" "receive~" "throw~" "catch~" "block~" "switch~" "readsf~" "writesf~" ; audio manipulation
+    "phasor~" "cos~" "osc~" "tabwrite~" "tabplay~" "tabread~" "tabread4~" "tabosc4~" "tabsend~" "tabreceive~" ; audio oscillators and tables
+    "vcf~" "noise~" "env~" "hip~" "lop~" "bp~" "biquad~" "samphold~" "print~" "rpole~" "rzero~" "rzero_rev~" "cpole~" "czero~" "czero_rev~" ; audio filters
+    "delwrite~" "delread~" "vd~"                     ; audio delay
+    ;; pd
+    "inlet" "outlet" "inlet~" "outlet~" ; subwindows
+    "struct" "drawcurve" "filledcurve" "drawpolygon" "filledpolygon" "plot" "drawnumber" ; data templates
+    "pointer" "get" "set" "element" "getsize" "setsize" "append" "scalar" ; accessing data
+    "sigmund~" "bonk~" "choice" "hilbert~" "complex-mod~" "expr~" "expr" "fexpr~" "loop~" "lrshift~" "pd~" "rev1~" "rev2~" "rev3~" "bob~"}) ; extras
 
 (def self-nodes #{"msg" "text"})
 

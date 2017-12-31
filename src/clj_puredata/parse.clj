@@ -1,8 +1,10 @@
 (ns clj-puredata.parse
+  "Facilites for parsing hiccup-style PureData node definitions into Clojure maps, and automatically generating connection entities as needed."
   (:require [clojure.test :as t]
             [vijual :as v]))
 
-(def parse-context (atom nil))
+(def parse-context
+  (atom nil))
 
 (defn- hiccup?
   [form]

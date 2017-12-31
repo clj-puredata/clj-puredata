@@ -1,4 +1,5 @@
 (ns clj-puredata.puredata
+  "PureData OSC communication and live reloading of patches."
   (:require [overtone.osc :refer [osc-client
                                   osc-send]]
             [clojure.java.shell :refer [sh]]))
@@ -10,6 +11,7 @@
 (defonce reload-targets (atom []))
 
 (defn open-pd []
+  "Attempts to run PureData and open OSC channel for communication."
   (reset! pd-process (future (sh "pd" "resources/reload-patch.pd"))))
 
 (defn- send-to-pd
@@ -25,10 +27,11 @@
     (send-to-pd "/reload" file-name dir)))
 
 (defn reload []
+  "Reloads all patches registered with LOAD-PATCH."
   (doseq [p @reload-targets]
     (reload-patch p)))
 
 (defn load-patch [& patch-names]
-  "Register the patches to be reloaded after _any_ WITH-PATCH is called."
+  "Registers the patches to be reloaded after _any_ WITH-PATCH is called."
   (reset! reload-targets patch-names)
   (reload))
