@@ -216,17 +216,32 @@
     :else (throw (Exception. (str "Not any recognizable form: " form)))))
 
 (defn outlet
-  "Use OUTLET to specify the intended outlet of a connection, e.g. (pd [:+ (outlet (pd [:moses ...]) 1)]). The default outlet is 0."
-  [node n]
-  (assoc node :outlet n))
+  "Use OUTLET to specify the intended outlet of a connection. 
+  E.g. (pd [:+ (outlet (pd [:moses ...]) 1)]). 
+  The default outlet is 0."
+  [n node]
+  (assert (number? n))
+  (assoc (pd node) :outlet n))
 
 (defn inlet
-  "Use INLET to specify the intended inlet for a connection, e.g. (pd [:/ 1 (inlet (pd ...) 1)]). The default inlet is determined by the source node argument position (not counting literals, only NIL and other nodes) (e.g. 0 in the previous example)."
-  [node n]
-  (assoc node :inlet n))
+  "Use INLET to specify the intended inlet for a connection.
+  E.g. (pd [:/ 1 (inlet (pd ...) 1)]). The default inlet is determined
+  by the source node argument position (not counting literals, only
+  NIL and other nodes) (e.g. 0 in the previous example)."
+  [n node]
+  (assert (number? n))
+  (assoc (pd node) :inlet n))
 
 (defn other
-  "An OTHER is a special node that refers to a previously defined node with :name = NAME in its :options map. It can be used to reduce the number of LETs in patch definitions, e.g. (pd [:osc- {:name \"foo\"} 200]) (pd [:dac- (other \"foo\") (other \"foo\")])."
+  "An OTHER is a special node that refers to another node.
+  It is a placeholder for the node with :name = NAME in its :options
+  map. It is instrumental to craft mutually connected nodes, and can
+  be used to reduce the number of LETs in patch definitions.  OTHER
+  nodes are de-referenced after the entire patch has been walked, so
+  forward reference is possible.
+  Example: (pd [:osc- {:name \"foo\"} 200]) (pd [:dac- (other \"foo\") (other \"foo\")]).
+  Example: (pd [:float {:name 'f} [:msg \"bang\"] [:+ 1 (other 'f)]]).
+  Example: (pd [:float {:name 'f} [:msg \"bang\"] (other '+)]) (pd [:+ {:name '+} 1 (other 'f)])."
   [name]
   {:type :node
    :other name})
