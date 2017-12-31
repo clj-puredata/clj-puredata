@@ -109,9 +109,10 @@
 (defn- assoc-layout
   [layout line]
   (if (node? line)
-    (let [fac 60
-          pos (first (filter #(= (str (:id line)) (:text %)) layout))]
-      (if pos
+    (let [pos (first (filter #(= (str (:id line)) (:text %)) layout))]
+      (if (and pos
+               (nil? (get-in [:options :x] line))
+               (nil? (get-in [:options :y] line)))
         (-> line
             (assoc-in [:options :x] (:xpos pos))
             (assoc-in [:options :y] (:ypos pos)))
