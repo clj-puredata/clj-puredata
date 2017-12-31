@@ -115,15 +115,36 @@
                     (vector? lookup) (to-string (get-in m lookup))))))
    (str ";")))
 
-(defn- translate-node
-  "Check for the presence of the :op of node N in the key sets of NODE-TEMPLATES, then use the corresponding template value to construct a string representation of the node."
+
+
+(defn- strip-file-extension
+  "Remove trailing \".pd\" from :op string of node."
   [n]
-  (loop [[k & rst] (keys node-templates)]
-    (cond (nil? k) (throw (Exception. (str "Not a valid node: " n)))
-          (k (:op n)) (->> n
-                           (merge-options (node-defaults k))
-                           (fill-template (node-templates k)))
-          :else (recur rst))))
+  (assoc n :op (string/replace (:op n) #"\.pd$" "")))
+
+(defn- op-suggests-patch?
+  "True for nodes whose :op string ends in \".pd\"."
+  [n]
+  (string/ends-with? (:op n) ".pd"))
+
+(defn- translate-node
+  "Match node to template, merge with default options and return filled template.
+  Checks for the presence of the :op-string of node N in the key sets
+  of NODE-TEMPLATES, then uses the corresponding template value to
+  construct a string representation of the node. Special case
+  where :op ends with \".pd\", which references another patch, and
+  uses the same template as other 'obj'-nodes."
+  [n]
+  (if (op-suggests-patch? n)
+    (->> (strip-file-extension n)
+         (merge-options (node-defaults obj-nodes))
+         (fill-template (node-templates obj-nodes)))
+    (loop [[k & rst] (keys node-templates)]
+      (cond (nil? k) (throw (Exception. (str "Not a valid node: " n)))
+            (k (:op n)) (->> n
+                             (merge-options (node-defaults k))
+                             (fill-template (node-templates k)))
+            :else (recur rst)))))
 
 (defn- translate-any
   "Construct a string representation for any map X using TEMPLATE."

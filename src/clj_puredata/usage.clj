@@ -88,8 +88,13 @@
   (pd [:text {:x 20 :y 20} "hello"])
   (pd [:/ 1 nil [:+ 1 2 3]]))
 
+(with-patch "include-another-patch.pd"
+  {:width 600 :height 600}
+  (pd ["view-height.pd" {:x 10 :y 10}])
+  (pd [:text {:x 10 :y 120} "Thats all folks!"]))
+
 (comment
   (open-pd)
-  (load-patch "view-height.pd")
+  (load-patch "include-another-patch.pd")
   )
 
