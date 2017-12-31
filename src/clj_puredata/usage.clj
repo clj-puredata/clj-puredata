@@ -64,24 +64,31 @@
          (other "src")])
     (pd [:*- {:name "final"} 0.1
          [:clip- (other "tap") -1 1]])
-    (pd [:dac- (other "final") (other "final")])))
+    (pd [:dac- (other "final") (other "final")]))
 
-(with-patch "mutual.pd"
-  {:width 800 :height 200}
-  (pd [:+ {:name 'add} (other 'f) 1])
-  (pd [:print {:x 0 :y 100}
-       [:float {:name 'f}
-        [:t {:name 't}
-         [:msg "bang"]]
-        (other 'add)]
-       (inlet 0 (outlet 1 (other 't)))]))
+  (with-patch "mutual.pd"
+    {:width 800 :height 200}
+    (pd [:+ {:name 'add} (other 'f) 1])
+    (pd [:print {:x 0 :y 100}
+         [:float {:name 'f}
+          [:t {:name 't}
+           [:msg "bang"]]
+          (other 'add)]
+         (inlet 0 (outlet 1 (other 't)))]))
 
-(with-patch "in-out-lets.pd"
-  (pd [:+ (inlet 1 [:- (outlet 1 [:moses 5])])]))
+  (with-patch "in-out-lets.pd"
+    (pd [:+ (inlet 1 [:- (outlet 1 [:moses 5])])])))
+
+(with-patch "view-height.pd"
+  {:width 800 :height 200
+   :graph-on-parent true
+   :hide-object-name true
+   :view-width 100 :view-height 100
+   :view-margin-x 20 :view-margin-y 40}
+  (pd [:text {:x 20 :y 20} "hello"]))
 
 (comment
   (open-pd)
-  (load-patch "mutual.pd")
-  (load-patch "in-out-lets.pd")
-)
+  (load-patch "view-height.pd")
+  )
 

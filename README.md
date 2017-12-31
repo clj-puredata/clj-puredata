@@ -10,7 +10,7 @@ FIXME: description
 - [ ] layout engine: uses ascii dims, maybe nicer with image dims?
 - [ ] layout engine: don't overwrite nodes that already have :x or :y set.
 - [ ] missing node types: float, symbol, sliders/buttons etc.
-- [ ] finish patch footer template for "graph on parent" options.
+- [x] finish patch footer template for "graph on parent" options.
 - [ ] patches (e.g. ["patch.pd" ...] should be recognized).
 - [ ] subpatches (needs multiple parsing contexts? e.g. map of context instead of single atom)
 

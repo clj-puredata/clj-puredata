@@ -26,24 +26,54 @@
 (def self-nodes #{"msg" "text"})
 
 (def patch-defaults
-  ;; default :options for patch maps
+  "Default :options for patch maps."
   {:type :patch
+   ;; window properties
    :x 0
    :y 0
    :width 450
-   :height 300})
+   :height 300
+   ;; graph properties
+   :graph-on-parent false
+   :hide-object-name false
+   :view-width 85
+   :view-height 60
+   :view-margin-x 0
+   :view-margin-y 0
+   :x-range-min 0
+   :x-range-max 100
+   :y-range-min 1
+   :y-range-max -1})
 
-(def default-options
-  ;; default :options for node maps
+(def node-defaults
+  "Default :options for node maps."
   {obj-nodes {:x 0 :y 0}
    self-nodes {:x 0 :y 0}})
 
 ;; templates are used to transform clojure maps into the actual strings in a puredata file.
+
 (def node-templates {obj-nodes ["#X" "obj" :x :y :op :args]
                      self-nodes ["#X" :op :x :y :args]})
-(def connection-template ["#X" "connect" [:from-node :id] [:from-node :outlet] [:to-node :id] [:to-node :inlet]])
-(def patch-header-template ["#N" "canvas" :x :y :width :height 10])
-(def patch-footer-template ["#X" "coords" "0 1 100 -1 200 140 1"]) ;; TODO figure out later
+
+(def connection-template ["#X" "connect"
+                          [:from-node :id]
+                          [:from-node :outlet]
+                          [:to-node :id]
+                          [:to-node :inlet]])
+
+(def patch-header-template ["#N" "canvas"
+                            :x :y :width :height
+                            10])
+
+#_(def subpatch-header-template ["#N" "canvas" :x :y :width :height :subpatch-name :visible])
+
+(def patch-footer-template ["#X" "coords"
+                            :x-range-min :y-range-min
+                            :x-range-max :y-range-max
+                            :view-width :view-height
+                            :graph-on-parent
+                            :view-margin-x :view-margin-y])
+
 (def subpatch-footer-template ["#X" "restore" "128 184" name]) ;; TODO figure out later
 
 (defn- merge-options
@@ -85,7 +115,7 @@
   (loop [[k & rst] (keys node-templates)]
     (cond (nil? k) (throw (Exception. (str "Not a valid node: " n)))
           (k (:op n)) (->> n
-                           (merge-options (default-options k))
+                           (merge-options (node-defaults k))
                            (fill-template (node-templates k)))
           :else (recur rst))))
 
@@ -104,23 +134,41 @@
     :patch-footer    (translate-any patch-footer-template l)
     :subpatch-footer (translate-any subpatch-footer-template l)))
 
+(defn numberize-graph-on-parent
+  "Conflate :graph-on-parent and :hide-object-name into a single number.
+  The option :graph-on-parent is conflated with the option :hide-object-name when represented in the patch file.
+  0 means :graph-on-parent is false, 1 means :graph-on-parent is true but :hide-object-name is false, 2 means both are true.
+  The fourth case does not matter and is not represented."
+  [m]
+  (assoc m :graph-on-parent (cond (and (:graph-on-parent m) (:hide-object-name m)) 2
+                                  (:graph-on-parent m) 1
+                                  :else 0)))
+
 (defn wrap-lines
-  "While nodes and connections are represented as single lines in a puredata patch file, the patch itself is defined over several lines,enclosing the other content in the form of headers and footers."
+  "Enclose nodes and connections with patch footer and header lines.
+  While nodes and connections are represented as single lines in a
+  puredata patch file, the patch itself is defined over several lines,
+  enclosing the other content in the form of headers and footers.
+  This function takes care of creating any that apply."
   [patch lines]
   (let [{:keys [graph-on-parent subpatch]} patch
+        ;;
         header-keys (select-keys patch [:x :y :width :height])
         footer-keys (-> patch
-                        (select-keys [:graph-on-parent :view-width :view-height])
-                        (update :graph-on-parent (fn [bool] (if bool 1 0))))
+                        (select-keys [:graph-on-parent :hide-object-name
+                                      :x-range-min :y-range-min
+                                      :x-range-max :y-range-max
+                                      :view-width :view-height
+                                      :view-margin-x :view-margin-y])
+                        numberize-graph-on-parent)
         subpatch-footer-keys (select-keys patch [:subpatch :parent-x :parent-y :name])
+        ;;
         header (merge {:type :patch-header}
                       header-keys)
-        footer-or-nil (and graph-on-parent
-                           (merge {:type :patch-footer}
-                                  footer-keys))
-        subpatch-footer-or-nil (and subpatch
-                                    (merge {:type :subpatch-footer}
-                                           subpatch-footer-keys))]
+        footer-or-nil (if graph-on-parent (merge {:type :patch-footer} footer-keys)
+                          nil)
+        subpatch-footer-or-nil (if subpatch (merge {:type :subpatch-footer} subpatch-footer-keys)
+                                   nil)]
     (remove nil? (cons header (conj lines footer-or-nil subpatch-footer-or-nil)))))
 
 (defn write-patch
