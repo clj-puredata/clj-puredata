@@ -75,8 +75,12 @@
         (other 'add)]
        (inlet 0 (outlet 1 (other 't)))]))
 
+(with-patch "in-out-lets.pd"
+  (pd [:+ (inlet 1 [:- (outlet 1 [:moses 5])])]))
+
 (comment
   (open-pd)
   (load-patch "mutual.pd")
+  (load-patch "in-out-lets.pd")
 )
 
