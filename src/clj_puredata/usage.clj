@@ -1,11 +1,12 @@
 (ns clj-puredata.usage
-  (:require [clj-puredata.parse :refer [pd
-                                        inlet
-                                        outlet
-                                        other]]
-            [clj-puredata.translate :refer [with-patch]]
-            [clj-puredata.puredata :refer [open-pd
-                                           load-patch]]))
+  "Examples for usage of clj-puredata."
+  (:require [clj-puredata.core :refer [open-pd
+                                       load-patch
+                                       with-patch
+                                       pd
+                                       inlet
+                                       outlet
+                                       other]]))
 (comment
   (with-patch "wobble.pd"
     {:width 800 :height 800}

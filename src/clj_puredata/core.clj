@@ -1,19 +1,27 @@
 (ns clj-puredata.core
-  (:require [clj-puredata.parse :refer [pd
-                                        inlet
-                                        outlet
-                                        other]]
-            [clj-puredata.translate :refer [with-patch]]
-            [clj-puredata.puredata :refer [open-pd
-                                           load-patch]])
+  (:require [clj-puredata.parse :as parse]
+            [clj-puredata.translate :as translate]
+            [clj-puredata.puredata :as puredata]
+            [potemkin :refer [import-vars]])
   (:gen-class))
 
-;; 1 - create a basic patch using WITH-PATCH.
-(with-patch "test.pd"
-  {:width 800 :height 800}
-  (pd [:text "Hello World"]))
+(import-vars
+ [clj-puredata.parse
+  pd
+  inlet
+  outlet
+  other]
+ [clj-puredata.translate
+  with-patch]
+ [clj-puredata.puredata
+  open-pd
+  load-patch])
 
 (comment
+  ;; 1 - create a basic patch using WITH-PATCH.
+  (with-patch "test.pd"
+    {:width 800 :height 800}
+    (pd [:text "Hello World"]))
   ;; 2 - open PureData.
   (open-pd)
   ;; 3 - load your patch.
