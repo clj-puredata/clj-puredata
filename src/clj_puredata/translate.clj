@@ -117,15 +117,32 @@
 
 
 
+(defn- op-suggests-patch?
+  "True for nodes whose :op string ends in \".pd\"."
+  [n]
+  (string/ends-with? (:op n) ".pd"))
+
 (defn- strip-file-extension
   "Remove trailing \".pd\" from :op string of node."
   [n]
   (assoc n :op (string/replace (:op n) #"\.pd$" "")))
 
-(defn- op-suggests-patch?
-  "True for nodes whose :op string ends in \".pd\"."
+(defn- get-by-matching-key-set
+  "Find MATCH in the key sets of map M; return the correlated value in M.
+  Assumes that the keys of M are clojure sets."
+  [m match]
+  (loop [[k & ks] (keys m)]
+    (cond (nil? k) (throw (Exception. (str "No key found matching " match " in: " m)))
+          (k match) (m k)
+          :else (recur ks))))
+
+(defn- get-node-template
   [n]
-  (string/ends-with? (:op n) ".pd"))
+  (get-by-matching-key-set node-templates (:op n)))
+
+(defn- get-node-default
+  [n]
+  (get-by-matching-key-set node-defaults (:op n)))
 
 (defn- translate-node
   "Match node to template, merge with default options and return filled template.
@@ -139,12 +156,9 @@
     (->> (strip-file-extension n)
          (merge-options (node-defaults obj-nodes))
          (fill-template (node-templates obj-nodes)))
-    (loop [[k & rst] (keys node-templates)]
-      (cond (nil? k) (throw (Exception. (str "Not a valid node: " n)))
-            (k (:op n)) (->> n
-                             (merge-options (node-defaults k))
-                             (fill-template (node-templates k)))
-            :else (recur rst)))))
+    (->> n
+         (merge-options (get-node-default n))
+         (fill-template (get-node-template n)))))
 
 (defn- translate-any
   "Construct a string representation for any map X using TEMPLATE."
