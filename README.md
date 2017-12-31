@@ -12,7 +12,7 @@ FIXME: description
 - [x] layout engine: push auto-layouted nodes down (so they're outside the graph-on-parent frame).
 - [ ] missing node types: float, symbol, sliders/buttons etc.
 - [x] finish patch footer template for "graph on parent" options.
-- [ ] patches (e.g. ["patch.pd" ...] should be recognized).
+- [x] patches (e.g. ["patch.pd" ...] should be recognized).
 - [ ] subpatches (needs multiple parsing contexts? e.g. map of context instead of single atom)
 
 ## Installation
