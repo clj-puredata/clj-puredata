@@ -84,8 +84,9 @@
    :graph-on-parent true
    :hide-object-name true
    :view-width 100 :view-height 100
-   :view-margin-x 20 :view-margin-y 40}
-  (pd [:text {:x 20 :y 20} "hello"]))
+   :view-margin-x 5 :view-margin-y 5}
+  (pd [:text {:x 20 :y 20} "hello"])
+  (pd [:/ 1 nil [:+ 1 2 3]]))
 
 (comment
   (open-pd)

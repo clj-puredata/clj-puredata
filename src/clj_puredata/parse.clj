@@ -114,8 +114,9 @@
                (nil? (get-in line [:options :x]))
                (nil? (get-in line [:options :y])))
         (-> line
-            (assoc-in [:options :x] (:xpos pos))
-            (assoc-in [:options :y] (:ypos pos)))
+            (assoc-in [:options :x] (+ 5 (:xpos pos)))
+            (assoc-in [:options :y] (+ 5 (:ypos pos)))
+            (assoc :auto-layout true))
         line))
     line))
 

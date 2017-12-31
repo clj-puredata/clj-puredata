@@ -171,6 +171,18 @@
                                    nil)]
     (remove nil? (cons header (conj lines footer-or-nil subpatch-footer-or-nil)))))
 
+(defn move-layout
+  "Move auto-layouted nodes out of graph-on-parent region.
+  That region is used for deliberately placed interface elements."
+  [patch lines]
+  (if (:graph-on-parent patch)
+    (mapv (fn [l]
+            (if (:auto-layout l)
+              (update-in l [:options :y] (fn [y] (+ y (+ (:view-height patch) (:view-margin-y patch)))))
+              l))
+          lines)
+    lines))
+
 (defn write-patch
   [file lines]
   (spit file (string/join "\n" lines)))
@@ -180,7 +192,10 @@
   (let [[patch forms] (if (map? options)
                         [(merge patch-defaults options) rest]
                         [patch-defaults (cons options rest)])]
-    `(let [lines# (wrap-lines ~patch (:lines (in-context ~@forms)))
+    `(let [lines# (->> (in-context ~@forms)
+                       :lines
+                       (wrap-lines ~patch)
+                       (move-layout ~patch))
            out# (map translate-line lines#)]
        (write-patch ~name out#)
        (reload))))

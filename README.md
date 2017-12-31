@@ -7,8 +7,9 @@ FIXME: description
 - [x] live reloading of newly generated patches into PureData
 - [x] parsing hiccup syntax.
 - [x] writing of PureData patch format.
-- [ ] layout engine: uses ascii dims, maybe nicer with image dims?
-- [ ] layout engine: don't overwrite nodes that already have :x or :y set.
+- [x] layout engine: uses ascii dims, maybe nicer with image dims?
+- [x] layout engine: don't overwrite nodes that already have :x or :y set.
+- [x] layout engine: push auto-layouted nodes down (so they're outside the graph-on-parent frame).
 - [ ] missing node types: float, symbol, sliders/buttons etc.
 - [x] finish patch footer template for "graph on parent" options.
 - [ ] patches (e.g. ["patch.pd" ...] should be recognized).
