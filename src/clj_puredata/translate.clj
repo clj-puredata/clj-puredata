@@ -1,11 +1,16 @@
 (ns clj-puredata.translate
-  "Translate the nodes and connections of a patch into into their PureData-conformant string representation."
+  "Translate the nodes and connections of a patch into into their PureData-conformant string representation.
+  Includes a set of templates (vectors of keywords (and literals)),
+  which are used to construct the string by picking corresponding
+  values from clojure maps. Also includes default values for various
+  types to make sure all necessary keywords are present for filling
+  the templates."
   (:require [clojure.string :as string]
             [clj-puredata.parse :refer [in-context]]
             [clj-puredata.puredata :refer [reload]]))
 
 (def obj-nodes
-  "Set of default node types available in PureData 0.47 (Vanilla)."
+  "Set of default node types ('obj') available in PureData 0.47 (Vanilla)."
   #{"bang" "b" "float" "f" "symbol" "int" "i" "send" "s" "receive" "r" "select" "route" "pack" "unpack" "trigger" "t" "spigot" "moses" "until" "print" "makefilename" "change" "swap" "value" "v" "list" ; general
     "delay" "metro" "line" "timer" "cputime" "realtime" "pipe" ; time
     "+" "-" "*" "/" "pow" "==" "!=" ">" "<" ">=" "<=" "&" "&&" "||" "||||" "%" "<<" ">>" "mtof" "powtodb" "rmstodb" "ftom" "dbtopow" "dbtorms" "mod" "div" "sin" "cos" "tan" "atan" "atan2" "sqrt" "log" "exp" "abs" "random" "max" "min" "clip" "wrap" ; math
@@ -23,10 +28,28 @@
     "pointer" "get" "set" "element" "getsize" "setsize" "append" "scalar" ; accessing data
     "sigmund~" "bonk~" "choice" "hilbert~" "complex-mod~" "expr~" "expr" "fexpr~" "loop~" "lrshift~" "pd~" "rev1~" "rev2~" "rev3~" "bob~"}) ; extras
 
-(def self-nodes #{"msg" "text"})
+(def self-nodes
+  "Set of nodes with simple representations using their name."
+  #{"msg" "text"})
+
+(def node-defaults
+  "Default :options for node maps, used to fill node templates"
+  {obj-nodes {:x 0 :y 0}
+   self-nodes {:x 0 :y 0}})
+
+(def node-templates
+  "Correlate sets of nodes with common templates."
+  {obj-nodes ["#X" "obj" :x :y :op :args]
+   self-nodes ["#X" :op :x :y :args]})
+
+(def connection-template ["#X" "connect"
+                          [:from-node :id]
+                          [:from-node :outlet]
+                          [:to-node :id]
+                          [:to-node :inlet]])
 
 (def patch-defaults
-  "Default :options for patch maps."
+  "Default :options for patch maps, used to fill the patch templates."
   {:type :patch
    ;; window properties
    :x 0
@@ -45,27 +68,9 @@
    :y-range-min 1
    :y-range-max -1})
 
-(def node-defaults
-  "Default :options for node maps."
-  {obj-nodes {:x 0 :y 0}
-   self-nodes {:x 0 :y 0}})
-
-;; templates are used to transform clojure maps into the actual strings in a puredata file.
-
-(def node-templates {obj-nodes ["#X" "obj" :x :y :op :args]
-                     self-nodes ["#X" :op :x :y :args]})
-
-(def connection-template ["#X" "connect"
-                          [:from-node :id]
-                          [:from-node :outlet]
-                          [:to-node :id]
-                          [:to-node :inlet]])
-
 (def patch-header-template ["#N" "canvas"
                             :x :y :width :height
                             10])
-
-#_(def subpatch-header-template ["#N" "canvas" :x :y :width :height :subpatch-name :visible])
 
 (def patch-footer-template ["#X" "coords"
                             :x-range-min :y-range-min
@@ -74,6 +79,7 @@
                             :graph-on-parent
                             :view-margin-x :view-margin-y])
 
+#_(def subpatch-header-template ["#N" "canvas" :x :y :width :height :subpatch-name :visible])
 (def subpatch-footer-template ["#X" "restore" "128 184" name]) ;; TODO figure out later
 
 (defn- merge-options
