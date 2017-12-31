@@ -46,26 +46,37 @@
     {:width 800 :height 200}
     (let [a 1]
       (pd [:+ {:y 50} 1 2]))
-    (pd [:text "lol"])))
+    (pd [:text "lol"]))
 
-(with-patch "clippercore.pd"
-  {:width 800 :height 800}
-  (pd [:phasor- {:name "src"} 200])
-  (pd [:osc- {:name "fast"} 3])
-  (pd [:osc- {:name "slow"} 1/10])
-  (pd [:min- {:name "low"} (other "fast") (other "slow")])
-  (pd [:max- {:name "high"} (other "fast") (other "slow")])
-  (pd [://- {:name "tap"}
-       [://- 2
-        [:--
-         [:+- (other "high") 1]
-         [:+- (other "low") 1]]]
-       (other "src")])
-  (pd [:*- {:name "final"} 0.1
-       [:clip- (other "tap") -1 1]])
-  (pd [:dac- (other "final") (other "final")]))
+  (with-patch "clippercore.pd"
+    {:width 800 :height 800}
+    (pd [:phasor- {:name "src"} 200])
+    (pd [:osc- {:name "fast"} 3])
+    (pd [:osc- {:name "slow"} 1/10])
+    (pd [:min- {:name "low"} (other "fast") (other "slow")])
+    (pd [:max- {:name "high"} (other "fast") (other "slow")])
+    (pd [://- {:name "tap"}
+         [://- 2
+          [:--
+           [:+- (other "high") 1]
+           [:+- (other "low") 1]]]
+         (other "src")])
+    (pd [:*- {:name "final"} 0.1
+         [:clip- (other "tap") -1 1]])
+    (pd [:dac- (other "final") (other "final")])))
+
+(with-patch "mutual.pd"
+  {:width 800 :height 200}
+  (pd [:+ {:name 'add} (other 'f) 1])
+  (pd [:print {:x 0 :y 100}
+       [:float {:name 'f}
+        [:t {:name 't}
+         [:msg "bang"]]
+        (other 'add)]
+       (inlet 0 (outlet 1 (other 't)))]))
 
 (comment
   (open-pd)
-  (load-patch "clippercore.pd"))
+  (load-patch "mutual.pd")
+)
 

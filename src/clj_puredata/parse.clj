@@ -25,6 +25,11 @@
   (and (map? arg)
        (= (:type arg) :node)))
 
+(defn- connection?
+  [arg]
+  (and (map? arg)
+       (= (:type arg) :connection)))
+
 (defn- other?
   "See OTHER."
   [node]
@@ -76,6 +81,21 @@
     (if (nil? solve)
       (throw (Exception. (str "Cannot resolve other node " other)))
       solve)))
+
+(defn resolve-all-other!
+  "Resolve references to OTHER nodes in connections with the actual node ids.
+  Called by IN-CONTEXT once all nodes have been walked."
+  []
+  (swap! parse-context update :lines
+         (fn [lines]
+           (vec (for [l lines]
+                  (cond
+                    (node? l) l
+                    (connection? l) (let [from (get-in l [:from-node :id])]
+                                      (if (other? from)
+                                        (assoc-in l [:from-node :id] (:id (resolve-other from)))
+                                        l))
+                    :else l))))))
 
 #_(defn- resolve
     "Resolve anything to a node, wether it already is or not."
@@ -136,7 +156,7 @@
   [from-node to-id inlet]
   {:type :connection
    :from-node {:id (if (other? from-node)
-                     (:id (resolve-other from-node))
+                     from-node
                      (:id from-node))
                :outlet (:outlet from-node 0)}
    :to-node {:id to-id
@@ -170,6 +190,7 @@
      (setup-parse-context)
      (let [nodes# (vector ~@forms)]
        (doall (map walk-tree! nodes#))
+       (resolve-all-other!)
        (let [lines# (layout-lines (sort-lines (:lines @parse-context)))]
          (teardown-parse-context)
          {:nodes nodes#
