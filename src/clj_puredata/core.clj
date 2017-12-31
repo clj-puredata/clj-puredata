@@ -3,7 +3,8 @@
             [clj-puredata.translate :as translate]
             [clj-puredata.puredata :as puredata]
             [potemkin :refer [import-vars]])
-  (:gen-class))
+  ;;(:gen-class)
+  )
 
 (import-vars
  [clj-puredata.parse
@@ -30,5 +31,5 @@
   ;; 5 - rinse and repeat.
   )
 
-(defn -main
-  [& args]) 
+#_(defn -main
+    [& args]) 
