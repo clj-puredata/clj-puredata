@@ -77,24 +77,40 @@
          (inlet 0 (outlet 1 (other 't)))]))
 
   (with-patch "in-out-lets.pd"
-    (pd [:+ (inlet 1 [:- (outlet 1 [:moses 5])])])))
+    (pd [:+ (inlet 1 [:- (outlet 1 [:moses 5])])]))
 
-(with-patch "view-height.pd"
-  {:width 800 :height 200
-   :graph-on-parent true
-   :hide-object-name true
-   :view-width 100 :view-height 100
-   :view-margin-x 5 :view-margin-y 5}
-  (pd [:text {:x 20 :y 20} "hello"])
-  (pd [:/ 1 nil [:+ 1 2 3]]))
+  (with-patch "view-height.pd"
+    {:width 800 :height 200
+     :graph-on-parent true
+     :hide-object-name true
+     :view-width 100 :view-height 100
+     :view-margin-x 5 :view-margin-y 5}
+    (pd [:text {:x 20 :y 20} "hello"])
+    (pd [:/ 1 nil [:+ 1 2 3]]))
 
-(with-patch "include-another-patch.pd"
-  {:width 600 :height 600}
-  (pd ["view-height.pd" {:x 10 :y 10}])
-  (pd [:text {:x 10 :y 120} "Thats all folks!"]))
+  (with-patch "include-another-patch.pd"
+    {:width 600 :height 600}
+    (pd ["view-height.pd" {:x 10 :y 10}])
+    (pd [:text {:x 10 :y 120} "Thats all folks!"]))
+
+  (with-patch "float-and-symbol-nodes.pd"
+    (pd [:t {:name 't} "b b b b" [:loadbang]])
+    (pd (apply conj [:print]
+               (map (partial inlet 0)
+                    [[:float 1 (outlet 3 (other 't))]
+                     [:f 2 (outlet 2 (other 't))]
+                     [:symbol "foo" (outlet 1 (other 't))]])))))
+
+  (with-patch "atom-nodes.pd"
+    (pd [:t {:name 't} "b b" [:loadbang]])
+    (pd [:floatatom {:name 'f :send-symbol "foo"} 123 (outlet 1 (other 't))])
+    (pd [:symbolatom {:name 's :send-symbol "bar"} "mysym" (outlet 0 (other 't))])
+    (pd [:print
+         (inlet 0 [:r "foo"])
+         (inlet 0 [:r "bar"])]))
 
 (comment
   (open-pd)
-  (load-patch "include-another-patch.pd")
+  (load-patch "atom-nodes.pd")
   )
 

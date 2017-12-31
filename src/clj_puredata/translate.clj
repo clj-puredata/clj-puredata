@@ -32,15 +32,37 @@
   "Set of nodes with simple representations using their name."
   #{"msg" "text"})
 
+(def atom-nodes
+  #{"floatatom" "symbolatom"})
+
+(def floatatom-node
+  #{"floatatom"})
+
+(def symbolatom-node
+  #{"symbolatom"})
+
+(def atom-node-defaults
+  "Common defaults for floatatom and symbolatom nodes."
+  {:send-symbol "-"
+   :receive-symbol "-"
+   :label-text "-"
+   :label-pos 0
+   :width 5
+   :lower-limit 0
+   :upper-limit 0})
+
 (def node-defaults
   "Default :options for node maps, used to fill node templates"
   {obj-nodes {:x 0 :y 0}
-   self-nodes {:x 0 :y 0}})
+   self-nodes {:x 0 :y 0}
+   floatatom-node (merge atom-node-defaults {:width 5})
+   symbolatom-node (merge atom-node-defaults {:width 10})})
 
 (def node-templates
   "Correlate sets of nodes with common templates."
   {obj-nodes ["#X" "obj" :x :y :op :args]
-   self-nodes ["#X" :op :x :y :args]})
+   self-nodes ["#X" :op :x :y :args]
+   atom-nodes ["#X" :op :x :y :width :lower-limit :upper-limit :label-pos :label-text :receive-symbol :send-symbol]})
 
 (def connection-template ["#X" "connect"
                           [:from-node :id]
