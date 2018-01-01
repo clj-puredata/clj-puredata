@@ -14,6 +14,7 @@ FIXME: description
 - [x] finish patch footer template for "graph on parent" options.
 - [x] patches (e.g. ["patch.pd" ...] should be recognized).
 - [ ] subpatches (needs multiple parsing contexts? e.g. map of context instead of single atom)
+- [ ] remove the need for explicit PD anywhere - make it implicit in WITH-PATCH, INLET, OUTLET, OTHER.
 
 ## Installation
 
