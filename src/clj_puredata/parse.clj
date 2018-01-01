@@ -226,7 +226,10 @@
 
 (defn pd
   [& forms]
-  (doall (map pd-single forms)))
+  (let [r (doall (map pd-single forms))]
+    (if (> (count r) 1)
+      r
+      (first r))))
 
 (defn outlet
   "Use OUTLET to specify the intended outlet of a connection. 
