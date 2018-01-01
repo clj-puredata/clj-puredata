@@ -47,34 +47,40 @@
 (def tgl-node
   #{"tgl"})
 
+(def common-node-defaults
+  "Super ultra lowest common denominator."
+  {:x 0 :y 0})
+
 (def atom-node-defaults
   "Common defaults for floatatom and symbolatom nodes."
-  {:send-symbol "-"
-   :receive-symbol "-"
-   :label-text "-"
-   :label-pos 0
-   :width 5
-   :lower-limit 0
-   :upper-limit 0})
+  (merge common-node-defaults
+         {:send-symbol "-"
+          :receive-symbol "-"
+          :label-text "-"
+          :label-pos 0
+          :width 5
+          :lower-limit 0
+          :upper-limit 0}))
 
 (def ui-node-defaults
   "Common defaults for bng, tgl, cnv and slider nodes."
-  {:send-symbol "empty"
-   :receive-symbol "empty"
-   :label-text "empty"
-   :label-x 17
-   :label-y 7
-   :font-family 0
-   :font-size 10
-   :bg-color -262144
-   :fg-color -1
-   :label-color -1
-   :size 15})
+  (merge common-node-defaults
+         {:send-symbol "empty"
+          :receive-symbol "empty"
+          :label-text "empty"
+          :label-x 17
+          :label-y 7
+          :font-family 0
+          :font-size 10
+          :bg-color -262144
+          :fg-color -1
+          :label-color -1
+          :size 15}))
 
 (def node-defaults
   "Default :options for node maps, used to fill node templates"
-  {obj-nodes {:x 0 :y 0}
-   self-nodes {:x 0 :y 0}
+  {obj-nodes common-node-defaults
+   self-nodes common-node-defaults
    floatatom-node (merge atom-node-defaults {:width 5})
    symbolatom-node (merge atom-node-defaults {:width 10})
    bng-node (merge ui-node-defaults {:hold 250 :interrupt 50 :init 0})
