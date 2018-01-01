@@ -41,6 +41,12 @@
 (def symbolatom-node
   #{"symbolatom"})
 
+(def bng-node
+  #{"bng"})
+
+(def tgl-node
+  #{"tgl"})
+
 (def atom-node-defaults
   "Common defaults for floatatom and symbolatom nodes."
   {:send-symbol "-"
@@ -51,18 +57,36 @@
    :lower-limit 0
    :upper-limit 0})
 
+(def ui-node-defaults
+  "Common defaults for bng, tgl, cnv and slider nodes."
+  {:send-symbol "empty"
+   :receive-symbol "empty"
+   :label-text "empty"
+   :label-x 17
+   :label-y 7
+   :font-family 0
+   :font-size 10
+   :bg-color -262144
+   :fg-color -1
+   :label-color -1
+   :size 15})
+
 (def node-defaults
   "Default :options for node maps, used to fill node templates"
   {obj-nodes {:x 0 :y 0}
    self-nodes {:x 0 :y 0}
    floatatom-node (merge atom-node-defaults {:width 5})
-   symbolatom-node (merge atom-node-defaults {:width 10})})
+   symbolatom-node (merge atom-node-defaults {:width 10})
+   bng-node (merge ui-node-defaults {:hold 250 :interrupt 50 :init 0})
+   tgl-node (merge ui-node-defaults {:init 0 :init-value 0  :nonzero-value 1})})
 
 (def node-templates
   "Correlate sets of nodes with common templates."
   {obj-nodes ["#X" "obj" :x :y :op :args]
    self-nodes ["#X" :op :x :y :args]
-   atom-nodes ["#X" :op :x :y :width :lower-limit :upper-limit :label-pos :label-text :receive-symbol :send-symbol]})
+   atom-nodes ["#X" :op :x :y :width :lower-limit :upper-limit :label-pos :label-text :receive-symbol :send-symbol]
+   bng-node ["#X obj" :x :y :op :size :hold :interrupt :init :send-symbol :receive-symbol :label-text :label-x :label-y :font-family :font-size :bg-color :fg-color :label-color]
+   tgl-node ["#X obj" :x :y :op :size :init :send-symbol :receive-symbol :label-text :label-x :label-y :font-family :font-size :bg-color :fg-color :label-color :init-value :nonzero-value]})
 
 (def connection-template ["#X" "connect"
                           [:from-node :id]

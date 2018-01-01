@@ -99,7 +99,7 @@
                (map (partial inlet 0)
                     [[:float 1 (outlet 3 (other 't))]
                      [:f 2 (outlet 2 (other 't))]
-                     [:symbol "foo" (outlet 1 (other 't))]])))))
+                     [:symbol "foo" (outlet 1 (other 't))]]))))
 
   (with-patch "atom-nodes.pd"
     (pd [:t {:name 't} "b b" [:loadbang]])
@@ -107,10 +107,14 @@
     (pd [:symbolatom {:name 's :send-symbol "bar"} "mysym" (outlet 0 (other 't))])
     (pd [:print
          (inlet 0 [:r "foo"])
-         (inlet 0 [:r "bar"])]))
+         (inlet 0 [:r "bar"])])))
+
+(with-patch "bng-and-tgl.pd"
+  (pd [:tgl {:x 10 :y 10}])
+  (pd [:bng {:x 30 :y 10}]))
 
 (comment
   (open-pd)
-  (load-patch "atom-nodes.pd")
+  (load-patch "bng-and-tgl.pd")
   )
 
