@@ -107,14 +107,33 @@
     (pd [:symbolatom {:name 's :send-symbol "bar"} "mysym" (outlet 0 (other 't))])
     (pd [:print
          (inlet 0 [:r "foo"])
-         (inlet 0 [:r "bar"])])))
+         (inlet 0 [:r "bar"])]))
 
-(with-patch "bng-and-tgl.pd"
-  (pd [:tgl {:x 10 :y 10}])
-  (pd [:bng {:x 30 :y 10}]))
+  (with-patch "bng-and-tgl.pd"
+    (pd [:tgl {:x 10 :y 10}])
+    (pd [:bng {:x 30 :y 10}]))
+  )
+
+(defn lotsa-bangs
+  []
+  (repeatedly 8
+              (fn [] [:bng {:x (rand-int 100)
+                            :y (rand-int 100)}])))
+
+(with-patch "multi.pd"
+  {:x 0}
+  (map pd (lotsa-bangs)))
+
+(with-patch "multi2.pd"
+  {:x 450}
+  (pd (lotsa-bangs)))
+
+(with-patch "multi3.pd"
+  {:x 900}
+  (apply pd (lotsa-bangs)))
 
 (comment
   (open-pd)
-  (load-patch "bng-and-tgl.pd")
+  (load-patch "multi.pd" "multi2.pd" "multi3.pd")
   )
 

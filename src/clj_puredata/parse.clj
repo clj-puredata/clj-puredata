@@ -192,7 +192,7 @@
   `(do
      (setup-parse-context)
      (let [nodes# (vector ~@forms)]
-       (doall (map walk-tree! nodes#))
+       (doall (map walk-tree! (flatten nodes#)))
        (resolve-all-other!)
        (let [lines# (-> @parse-context
                         :lines
@@ -202,7 +202,7 @@
          {:nodes nodes#
           :lines lines#}))))
 
-(defn pd
+(defn pd-single
   "Turn hiccup vectors into trees of node maps, ready to be walked by WALK-TREE!."
   [form]
   (cond
@@ -213,13 +213,20 @@
                            [{} (rest form)])
           op (op-from-kw (first form))
           id (dispense-node-id)
-          parsed-args (mapv pd args)
+          parsed-args (mapv pd-single args)
           node {:type :node :op op :id id :options options :args parsed-args}]
       node)
     (literal? form) form
     (node? form) form
     (fn? form) (form)
+    (or (list? form)
+        (vector? form)
+        (seq? form)) (doall (map pd-single form))
     :else (throw (Exception. (str "Not any recognizable form: " form)))))
+
+(defn pd
+  [& forms]
+  (doall (map pd-single forms)))
 
 (defn outlet
   "Use OUTLET to specify the intended outlet of a connection. 
