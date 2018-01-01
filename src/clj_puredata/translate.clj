@@ -151,7 +151,8 @@
                     (integer? elm) (str elm)
                     (float? elm) (format "%f" elm)
                     (rational? elm) (to-string (float elm)))
-    :else (str elm)))
+    (string? elm) (string/replace elm #"[$,;]" #(str \\ %))
+    :else (to-string (str elm))))
 
 (defn- fill-template
   "Use a vector T of literals and keys to construct a string representation of the map M."
