@@ -2,9 +2,7 @@
   (:require [clj-puredata.parse :as parse]
             [clj-puredata.translate :as translate]
             [clj-puredata.puredata :as puredata]
-            [potemkin :refer [import-vars]])
-  ;;(:gen-class)
-  )
+            [potemkin :refer [import-vars]]))
 
 (import-vars
  [clj-puredata.parse
@@ -29,7 +27,4 @@
   (load-patch "test.pd")
   ;; 4 - now edit the original WITH-PATCH, evaluate it, and see PureData update accordingly.
   ;; 5 - rinse and repeat.
-  )
-
-#_(defn -main
-    [& args]) 
+  ) 

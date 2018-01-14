@@ -99,13 +99,6 @@
                                         l))
                     :else l))))))
 
-#_(defn- resolve
-    "Resolve anything to a node, wether it already is or not."
-    [n]
-    (if (other? n)
-      (resolve-other n)
-      n))
-
 (defn- assoc-layout
   [layout line]
   (if (node? line)
@@ -261,15 +254,3 @@
   [name]
   {:type :node
    :other name})
-
-#_(defn connect
-    "Connect two nodes.
-  This verb is necessary because argument or OTHER nodes can only be
-  previously defined nodes. Since nodes cannot be re-defined, this is
-  the appropriate way to treat nodes that are mutually connected."
-    ;; problem: how to pass INLET and OUTLET through OTHER?
-    [to & froms]
-    (doall
-     (map-indexed (fn [i c]
-                    (add-element! (connection c (:id to) (or (:inlet to) i))))
-                  froms)))
