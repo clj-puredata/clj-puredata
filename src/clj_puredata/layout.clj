@@ -43,7 +43,7 @@
     (set-row! node row)
     (when-not (visited-before? node)
       (set-col! node col)
-      (swap! min-col #(if (> col %) col %))
+      (swap! min-col #(if (>= col %) (inc col) %))
       (swap! visited-nodes conj node))
     (doall (map-indexed #(run-chain %2
                                     :row (inc row)
