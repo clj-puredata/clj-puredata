@@ -44,8 +44,6 @@ Second outlet outputs 1 when number enters range and 0 when it exits range."}
         [:throw- "output" %])))
 
 (with-patch "song01.pd"
-  ;; main bpm
-  (pd ["beats.pd" {:name 'beats} 125])
   ;; output sum
   (pd [:*- {:name 'dac} 0.1 [:catch- "output"]]
       [:dac- (other 'dac) (other 'dac)])
@@ -54,8 +52,10 @@ Second outlet outputs 1 when number enters range and 0 when it exits range."}
   (sound1 10 4 7 1)
   (sound1 8 0 1 2)
   (sound1 10 4 5 3)
+  ;; main bpm
+  (pd ["beats.pd" {:name 'beats} 125])
   ;; misc
-  (pd ["between.pd" {:name 'bt} 0 4 (other 'beats)]
+  #_(pd ["between.pd" {:name 'bt} 0 4 (other 'beats)]
       [:print "count-between" (other 'bt)]
       [:print "on-off-between" (outlet 1 (other 'bt))]))
 
