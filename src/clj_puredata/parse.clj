@@ -1,7 +1,6 @@
 (ns clj-puredata.parse
   "Facilites for parsing hiccup-style PureData node definitions into Clojure maps, and automatically generating connection entities as needed."
   (:require [clojure.test :as t]
-            [vijual :as v]
             [clj-puredata.common :refer :all]
             [clj-puredata.layout :as l]))
 
