@@ -1,42 +1,12 @@
 (ns clj-puredata.parse
   "Facilites for parsing hiccup-style PureData node definitions into Clojure maps, and automatically generating connection entities as needed."
   (:require [clojure.test :as t]
-            [vijual :as v]))
+            [vijual :as v]
+            [clj-puredata.common :refer :all]
+            [clj-puredata.layout :as l]))
 
 (def parse-context
   (atom nil))
-
-(defn- hiccup?
-  [form]
-  (and (vector? form)
-       (or (keyword? (first form))
-           (string? (first form)))))
-
-(defn- literal?
-  "Returns TRUE for numbers, strings and NIL."
-  [arg]
-  (if (or (number? arg)
-          (string? arg)
-          (char? arg)
-          (nil? arg))
-    true
-    false))
-
-(defn- node?
-  [arg]
-  (and (map? arg)
-       (= (:type arg) :node)))
-
-(defn- connection?
-  [arg]
-  (and (map? arg)
-       (= (:type arg) :connection)))
-
-(defn- other?
-  "See OTHER."
-  [node]
-  (and (nil? (:id node))
-       (some? (:other node))))
 
 (defn- processed?
   [node]
@@ -99,7 +69,7 @@
                                         l))
                     :else l))))))
 
-(defn- assoc-layout
+#_(defn- assoc-layout
   [layout line]
   (if (node? line)
     (let [pos (first (filter #(= (str (:id line)) (:text %)) layout))]
@@ -113,7 +83,7 @@
         line))
     line))
 
-(defn layout-lines
+#_(defn layout-lines
   [lines]
   (let [connections (filter #(= :connection (:type %)) lines)
         edges (map #(vector (get-in % [:from-node :id])
@@ -189,7 +159,7 @@
        (resolve-all-other!)
        (let [lines# (-> @parse-context
                         :lines
-                        layout-lines
+                        l/layout-lines
                         sort-lines)]
          (teardown-parse-context)
          {:nodes nodes#
