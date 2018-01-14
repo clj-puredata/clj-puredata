@@ -1,5 +1,6 @@
 (ns clj-puredata.layout
-  (:require [clj-puredata.common :refer :all]))
+  (:require [clojure.set]
+            [clj-puredata.common :refer :all]))
 
 (def node-map (atom {})) ;; map of nodes, keyed by node id
 
@@ -60,9 +61,6 @@
                    (apply max (map node-name-len col)))
         col-indents (reduce (fn [a b] (conj a (+ (last a) b)))
                             [0] col-lens)]
-    (clojure.pprint/pprint cols)
-    (println col-lens)
-    (println col-indents)
     (swap! node-map
            #(->> %
                  (map (fn [[k v]]
