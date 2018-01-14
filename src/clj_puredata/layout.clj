@@ -33,10 +33,9 @@
   [node & {:keys [score parent-chain]
            :or {score 0
                 parent-chain []}}]
-  (when-not (visited-before? node)
-    (swap! visited-nodes conj node)
-    (when-not (.contains parent-chain node)
-      (set-score! node score))
+  (when-not (.contains parent-chain node)
+    (when-not (visited-before? node) (swap! visited-nodes conj node))
+    (set-score! node score)
     (doall (map #(run-chain %
                             :score (inc score)
                             :parent-chain (conj parent-chain node))
