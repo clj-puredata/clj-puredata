@@ -1,11 +1,11 @@
 (ns clj-puredata.layout
   (:require [clj-puredata.common :refer :all]))
 
-(def visited-nodes (atom []))
-
 (def node-map (atom {})) ;; map of nodes, keyed by node id
 
 (def connections-map (atom {})) ;; map of connections, keyed by node id of originating node
+
+(def visited-nodes (atom []))
 
 (def min-col (atom 0)) ;; minimum indentation for next call of run-chain
 
@@ -52,15 +52,24 @@
                         (child-nodes node)))))
 
 (defn convert-rows!
-  "Use ROW property to assign :Y position to nodes."
+  "Use ROW and COL properties to assign :Y and :X position to nodes."
   []
-  (swap! node-map
-         #(->> %
-               (map (fn [[k v]]
-                      [k (-> v
-                             (assoc-in [:options :y] (* (:row v) 40))
-                             (assoc-in [:options :x] (* (:col v) 100)))]))
-               (into {}))))
+  (let [cols (group-by :col (vals @node-map))
+        node-name-len #(count (clojure.string/join " " (cons (:op %) (:args %))))
+        col-lens (for [n (range (count cols)) :let [col (cols n)]] ;; assure correct order
+                   (apply max (map node-name-len col)))
+        col-indents (reduce (fn [a b] (conj a (+ (last a) b)))
+                            [0] col-lens)]
+    (clojure.pprint/pprint cols)
+    (println col-lens)
+    (println col-indents)
+    (swap! node-map
+           #(->> %
+                 (map (fn [[k v]]
+                        [k (-> v
+                               (assoc-in [:options :y] (* (:row v) 40))
+                               (assoc-in [:options :x] (* (col-indents (:col v)) 7)))]))
+                 (into {})))))
 
 (defn sorted-nodes
   []
@@ -78,6 +87,8 @@
     (reset! min-col 0)
     (reset! node-map (into {} (map #(vector (:id %) %) nodes)))
     (reset! connections-map (group-by #(get-in % [:from-node :id]) connections))
+    ;;
     (doall (map run-chain top-nodes))
     (convert-rows!)
+    ;;
     (into (sorted-nodes) connections)))
