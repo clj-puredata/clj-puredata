@@ -2,6 +2,13 @@
   (:require [clj-puredata.parse :refer :all]
             [clojure.test :refer :all]))
 
+(defn assure-no-context
+  [f]
+  (teardown-parse-context)
+  (f))
+
+(use-fixtures :each assure-no-context)
+
 (deftest constructing-the-tree
   (testing "The function PD"
     (testing "will expand hiccup [:+ 1 2] to maps {:type ::node ...}."
@@ -63,6 +70,6 @@
                  (nth 2) :to-node :inlet)
              1)))
     (testing "respects the keys set by #'OUTLET and #'INLET and modifies connections accordingly."
-      (is (let [p (:lines (in-context (pd [:+ (outlet (pd [:*]) 23) (inlet (pd [:/]) 42)])))]
+      (is (let [p (:lines (in-context (pd [:+ (outlet 23 (pd [:*])) (inlet 42 (pd [:/]))])))]
             (and (= (-> p (nth 3) :from-node :outlet) 23)
                  (= (-> p (nth 4) :to-node :inlet) 42)))))))

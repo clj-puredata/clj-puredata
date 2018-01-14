@@ -197,7 +197,7 @@
   [n]
   (get-by-matching-key-set node-defaults (:op n)))
 
-(defn- translate-node
+(defn translate-node
   "Match node to template, merge with default options and return filled template.
   Checks for the presence of the :op-string of node N in the key sets
   of NODE-TEMPLATES, then uses the corresponding template value to
