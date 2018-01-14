@@ -8,13 +8,18 @@
                                        other]]))
 
 (with-patch "song02.pd"
+  {:graph-on-parent true
+   :view-width 100
+   :view-height 100}
   (pd [:outlet
        [:pack "f" "f"
         [:t {:name 't} "f" "f" [:msg "1"]]
         [:moses {:name 'm} 4 [:+ 1
                               (outlet 1 (other 't))
-                              (other 'c)]]]]
-      [:msg {:name 'c} "5" (outlet 1 (other 'm))]))
+                              (other 'c)
+                              (inlet 1 (other 'outlier))]]]]
+      [:msg {:name 'c} "5" (outlet 1 (other 'm))]
+      [:msg {:name 'outlier} "outlier"]))
 
 (defn startup
   []
