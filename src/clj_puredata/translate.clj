@@ -7,7 +7,7 @@
   the templates."
   (:require [clojure.string :as string]
             [clj-puredata.parse :refer [in-context]]
-            [clj-puredata.puredata :refer [reload]]))
+            [clj-puredata.comms :refer [reload]]))
 
 (def obj-nodes
   "Set of default node types ('obj') available in PureData 0.47 (Vanilla)."
