@@ -1,4 +1,4 @@
-(ns clj-puredata.puredata
+(ns clj-puredata.comms
   "PureData OSC communication and live reloading of patches."
   (:require [overtone.osc :refer [osc-client
                                   osc-send]]
