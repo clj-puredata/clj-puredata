@@ -23,8 +23,8 @@ Second outlet outputs 1 when number enters range and 0 when it exits range."}
         [:moses "$1" %]
         [:moses {:name 'm} "$2" (outlet 1 %)]
         [:t {:name 't} "f f" %]
-        [:outlet {:x 0} %])
-      [:outlet {:x 10}
+        [:outlet {:x 5} %])
+      [:outlet {:x 105}
        [:change [:msg 1 (outlet 1 (other 't))]
         (inlet 0 [:msg 0 (outlet 1 (other 'm))])]]))
 

@@ -52,8 +52,7 @@
                                     :parent-chain (conj parent-chain node))
                         (child-nodes node)))))
 
-(defn convert-rows!
-  "Use ROW and COL properties to assign :Y and :X position to nodes."
+(defn column-indentations
   []
   (let [cols (group-by :col (vals @node-map))
         node-name-len #(count (clojure.string/join " " (cons (:op %) (:args %))))
@@ -61,12 +60,34 @@
                    (apply max (map node-name-len col)))
         col-indents (reduce (fn [a b] (conj a (+ (last a) b)))
                             [0] col-lens)]
+    (mapv #(* % 7) col-indents)))
+
+(defn manually-positioned?
+  [n]
+  (and (get-in n [:options :x])
+       (get-in n [:options :y])))
+
+(defn auto-position
+  [n & {:keys [col-pos row-pos
+               x-offset y-offset]
+        :or {col-pos (fn [n] (* n 100))
+             row-pos (fn [n] (* n 40))
+             x-offset 5 y-offset 5}}]
+  (-> n
+      (update-in [:options :y] (fn [y] (if (some? y) y (+ y-offset (row-pos (:row n))))))
+      (update-in [:options :x] (fn [x] (if (some? x) x (+ x-offset (col-pos (:col n))))))
+      (assoc :auto-layout true)))
+
+(defn convert-rows!
+  "Use ROW and COL properties to assign :Y and :X position to nodes."
+  []
+  (let [col-indents (column-indentations)]
     (swap! node-map
            #(->> %
                  (map (fn [[k v]]
-                        [k (-> v
-                               (assoc-in [:options :y] (* (:row v) 40))
-                               (assoc-in [:options :x] (* (col-indents (:col v)) 7)))]))
+                        (if (manually-positioned? v)
+                          [k v]
+                          [k (auto-position v :col-pos col-indents)])))
                  (into {})))))
 
 (defn sorted-nodes
