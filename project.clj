@@ -6,7 +6,7 @@
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [overtone/osc-clj "0.9.0"]
                  [potemkin "0.4.4"]]
-  :main ^:skip-aot clj-puredata.core
+  :main clj-puredata.comms
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}}
   :plugins [[lein-codox "0.10.3"]])
