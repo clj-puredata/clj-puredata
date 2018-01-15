@@ -151,7 +151,9 @@
                     (integer? elm) (str elm)
                     (float? elm) (format "%f" elm)
                     (rational? elm) (to-string (float elm)))
-    (string? elm) (string/replace elm #"[$,;]" #(str \\ %))
+    (string? elm) (-> elm
+                      (string/replace #"\$" #(str \\ %))
+                      (string/replace #"[,;]" #(str " \\" %)))
     :else (to-string (str elm))))
 
 (defn- fill-template
