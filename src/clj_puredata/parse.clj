@@ -5,15 +5,24 @@
             [clj-puredata.layout :as l]))
 
 (def parse-context
-  (atom nil))
+  (atom []))
+
+(defn current-context
+  []
+  (dec (count @parse-context)))
+
+(defn update-in-parse-context
+  [key & rest]
+  (apply swap! parse-context update-in [(current-context) key] rest))
 
 (defn- processed?
   [node]
-  ((:processed-node-ids @parse-context) (:id node)))
+  ((:processed-node-ids (last @parse-context)) (:id node)))
 
 (defn- record-as-processed
   [node]
-  (swap! parse-context update :processed-node-ids conj (:id node)))
+  ;;(swap! parse-context update-in [(current-context) :processed-node-ids] conj (:id node))
+  (update-in-parse-context :processed-node-ids conj (:id node)))
 
 (defn- node-or-explicit-skip?
   "When determining the target inlet of a connection, the source nodes argument position is consulted.
@@ -23,32 +32,37 @@
   (or (node? x) (nil? x)))
 
 (defn setup-parse-context []
-  (reset! parse-context {:current-node-id 0
-                         :lines []
-                         :processed-node-ids #{}}))
+  (swap! parse-context conj {:current-node-id 0
+                             :lines []
+                             :processed-node-ids #{}}))
 
 (defn teardown-parse-context []
-  (reset! parse-context nil))
+  (try
+    (swap! parse-context pop)
+    (catch IllegalStateException e
+      [])))
 
 (defn- add-element!
   "Add NODE to the current PARSE-CONTEXT."
   [e]
-  (swap! parse-context update :lines conj e)
+  ;;(swap! parse-context update-in [(current-context) :lines] conj e)
+  (update-in-parse-context :lines conj e)
   e)
 
 (defn- dispense-node-id
   "When a PARSE-CONTEXT is active, dispense one new (running) index."
   []
-  (if-let [id (:current-node-id @parse-context)]
-    (do (swap! parse-context update :current-node-id inc)
-        id)
+  (if-let [id (:current-node-id (last @parse-context))]
+    (do ;;(swap! parse-context update-in [(current-context) :current-node-id] inc)
+      (update-in-parse-context :current-node-id inc)
+      id)
     -1))
 
 (defn- resolve-other
   "Try to find the referenced node in the current PARSE-CONTEXT."
   [other]
   (let [solve (first (filter #(= (:other other) (get-in % [:options :name]))
-                             (@parse-context :lines)))]
+                             ((last @parse-context) :lines)))]
     (if (nil? solve)
       (throw (Exception. (str "Cannot resolve other node " other)))
       solve)))
@@ -57,16 +71,17 @@
   "Resolve references to OTHER nodes in connections with the actual node ids.
   Called by IN-CONTEXT once all nodes have been walked."
   []
-  (swap! parse-context update :lines
-         (fn [lines]
-           (vec (for [l lines]
-                  (cond
-                    (node? l) l
-                    (connection? l) (let [from (get-in l [:from-node :id])]
-                                      (if (other? from)
-                                        (assoc-in l [:from-node :id] (:id (resolve-other from)))
-                                        l))
-                    :else l))))))
+  ;;swap! parse-context update-in [(current-context) :lines]
+  (update-in-parse-context :lines
+                           (fn [lines]
+                             (vec (for [l lines]
+                                    (cond
+                                      (node? l) l
+                                      (connection? l) (let [from (get-in l [:from-node :id])]
+                                                        (if (other? from)
+                                                          (assoc-in l [:from-node :id] (:id (resolve-other from)))
+                                                          l))
+                                      :else l))))))
 
 #_(defn- assoc-layout
   [layout line]
@@ -156,7 +171,7 @@
      (let [nodes# (vector ~@forms)]
        (doall (map walk-tree! (flatten nodes#)))
        (resolve-all-other!)
-       (let [lines# (-> @parse-context
+       (let [lines# (-> (last @parse-context)
                         :lines
                         l/layout-lines
                         sort-lines)]
