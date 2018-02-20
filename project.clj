@@ -1,4 +1,4 @@
-(defproject clj-puredata "0.1.0-SNAPSHOT"
+(defproject clj-puredata "0.1.1-SNAPSHOT"
   :description "generate PureData patches."
   :url "https://github.com/pdikmann/clj-puredata"
   :license {:name "The MIT License (MIT)"
