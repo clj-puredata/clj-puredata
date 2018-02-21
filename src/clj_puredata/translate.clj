@@ -47,6 +47,9 @@
 (def tgl-node
   #{"tgl"})
 
+(def slider-nodes
+  #{"hsl" "vsl"})
+
 (def common-node-defaults
   "Super ultra lowest common denominator."
   {:x 0 :y 0})
@@ -77,6 +80,17 @@
           :label-color -1
           :size 15}))
 
+(def slider-node-defaults
+  (merge ui-node-defaults
+         {:width 15
+          :height 15 ; same for horizontal and vertical because lazy
+          :bottom 0
+          :top 127
+          :log 0
+          :init 0
+          :default 0 ; default means: saved slider position, in pixels.
+          :steady-on-click 1}))
+
 (def node-defaults
   "Default :options for node maps, used to fill node templates"
   {obj-nodes common-node-defaults
@@ -84,7 +98,8 @@
    floatatom-node (merge atom-node-defaults {:width 5})
    symbolatom-node (merge atom-node-defaults {:width 10})
    bng-node (merge ui-node-defaults {:hold 250 :interrupt 50 :init 0})
-   tgl-node (merge ui-node-defaults {:init 0 :init-value 0  :nonzero-value 1})})
+   tgl-node (merge ui-node-defaults {:init 0 :init-value 0  :nonzero-value 1})
+   slider-nodes slider-node-defaults})
 
 (def node-templates
   "Correlate sets of nodes with common templates."
@@ -92,7 +107,8 @@
    self-nodes ["#X" :op :x :y :args]
    atom-nodes ["#X" :op :x :y :width :lower-limit :upper-limit :label-pos :label-text :receive-symbol :send-symbol]
    bng-node ["#X obj" :x :y :op :size :hold :interrupt :init :send-symbol :receive-symbol :label-text :label-x :label-y :font-family :font-size :bg-color :fg-color :label-color]
-   tgl-node ["#X obj" :x :y :op :size :init :send-symbol :receive-symbol :label-text :label-x :label-y :font-family :font-size :bg-color :fg-color :label-color :init-value :nonzero-value]})
+   tgl-node ["#X obj" :x :y :op :size :init :send-symbol :receive-symbol :label-text :label-x :label-y :font-family :font-size :bg-color :fg-color :label-color :init-value :nonzero-value]
+   slider-nodes ["#X obj" :x :y :op :width :height :bottom :top :log :init :send-symbol :receive-symbol :label-text :label-x :label-y :font-family :font-size :bg-color :fg-color :label-color :default :steady-on-click]})
 
 (def connection-template ["#X" "connect"
                           [:from-node :id]
