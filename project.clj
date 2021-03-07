@@ -3,7 +3,7 @@
   :url "https://github.com/pdikmann/clj-puredata"
   :license {:name "The MIT License (MIT)"
             :url "https://opensource.org/licenses/MIT"}
-  :dependencies [[org.clojure/clojure "1.8.0"]
+  :dependencies [[org.clojure/clojure "1.10.3"]
                  [overtone/osc-clj "0.9.0"]
                  [potemkin "0.4.4"]]
   :main clj-puredata.comms
