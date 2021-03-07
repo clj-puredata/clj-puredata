@@ -49,7 +49,6 @@
 (defn- add-element!
   "Add NODE to the current PARSE-CONTEXT."
   [e]
-  ;;(swap! parse-context update-in [(current-context) :lines] conj e)
   (update-in-parse-context :lines conj e)
   e)
 
@@ -57,9 +56,8 @@
   "When a PARSE-CONTEXT is active, dispense one new (running) index."
   []
   (if-let [id (:current-node-id (last @parse-context))]
-    (do ;;(swap! parse-context update-in [(current-context) :current-node-id] inc)
-      (update-in-parse-context :current-node-id inc)
-      id)
+    (do (update-in-parse-context :current-node-id inc)
+        id)
     -1))
 
 (defn- resolve-other
@@ -75,7 +73,6 @@
   "Resolve references to OTHER nodes in connections with the actual node ids.
   Called by IN-CONTEXT once all nodes have been walked."
   []
-  ;;swap! parse-context update-in [(current-context) :lines]
   (update-in-parse-context :lines
                            (fn [lines]
                              (vec (for [l lines]
