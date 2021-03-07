@@ -1,4 +1,5 @@
-(ns clj-puredata.common)
+(ns clj-puredata.common
+  "Helper predicates for identifying common constructs.")
 
 (defn hiccup?
   [form]
@@ -7,7 +8,7 @@
            (string? (first form)))))
 
 (defn literal?
-  "Returns TRUE for numbers, strings and NIL."
+  "Returns `true` for numbers, strings and `nil`."
   [arg]
   (if (or (number? arg)
           (string? arg)
@@ -17,17 +18,20 @@
     false))
 
 (defn node?
+  "Identifies maps whose `:type` equals `:node`. "
   [arg]
   (and (map? arg)
        (= (:type arg) :node)))
 
 (defn connection?
+  "Identifies maps whose `:type` equals `:connection`."
   [arg]
   (and (map? arg)
        (= (:type arg) :connection)))
 
 (defn other?
-  "See OTHER."
+  "Check if a node is a placeholder or duplicate (it has no `:id`, but references an `:other`).
+  Also see [[other]]."
   [node]
   (and (nil? (:id node))
        (some? (:other node))))

@@ -210,7 +210,7 @@
 
 (defn outlet
   "Use OUTLET to specify the intended outlet of a connection. 
-  E.g. (pd [:+ (outlet (pd [:moses ...]) 1)]). 
+  E.g. `(pd [:+ (outlet (pd [:moses ...]) 1)])`. 
   The default outlet is 0."
   [n node]
   (assert (number? n))
@@ -218,7 +218,7 @@
 
 (defn inlet
   "Use INLET to specify the intended inlet for a connection.
-  E.g. (pd [:/ 1 (inlet (pd ...) 1)]). The default inlet is determined
+  E.g. `(pd [:/ 1 (inlet (pd ...) 1)])`. The default inlet is determined
   by the source node argument position (not counting literals, only
   NIL and other nodes) (e.g. 0 in the previous example)."
   [n node]
@@ -227,14 +227,30 @@
 
 (defn other
   "An OTHER is a special node that refers to another node.
-  It is a placeholder for the node with :name = NAME in its :options
+  It is a placeholder for the node with `:name` = NAME in its `:options`
   map. It is instrumental to craft mutually connected nodes, and can
   be used to reduce the number of LETs in patch definitions.  OTHER
   nodes are de-referenced after the entire patch has been walked, so
   forward reference is possible.
-  Example: (pd [:osc- {:name \"foo\"} 200]) (pd [:dac- (other \"foo\") (other \"foo\")]).
-  Example: (pd [:float {:name 'f} [:msg \"bang\"] [:+ 1 (other 'f)]]).
-  Example: (pd [:float {:name 'f} [:msg \"bang\"] (other '+)]) (pd [:+ {:name '+} 1 (other 'f)])."
+
+  Examples:
+
+  ```clojure
+  ;; connecting the same node to 2 inlets
+  (pd [:osc- {:name \"foo\"} 200])
+  (pd [:dac- (other \"foo\") (other \"foo\")])
+  ```
+
+  ```clojure
+  ;; circular connections
+  (pd [:float {:name 'f} [:msg \"bang\"] [:+ 1 (other 'f)]])
+  ```
+
+  ```clojure
+  ;; connecting to nodes ahead of their definition
+  (pd [:float {:name 'f} [:msg \"bang\"] (other '+)])
+  (pd [:+ {:name '+} 1 (other 'f)])
+  ```"
   [name]
   {:type :node
    :other name})

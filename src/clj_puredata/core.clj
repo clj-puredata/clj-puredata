@@ -1,4 +1,5 @@
 (ns clj-puredata.core
+  "Collects all user-facing functions of the other namespaces, for easy import."
   (:require [clj-puredata.parse :as parse]
             [clj-puredata.translate :as translate]
             [clj-puredata.comms :as comms]
