@@ -5,7 +5,8 @@
             :url "https://opensource.org/licenses/MIT"}
   :dependencies [[org.clojure/clojure "1.10.3"]
                  [overtone/osc-clj "0.9.0"]
-                 [potemkin "0.4.4"]]
+                 [potemkin "0.4.4"]
+                 [org.clojure/tools.trace "0.7.11"]]
   :main clj-puredata.comms
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}}
