@@ -54,11 +54,15 @@
 
 (defn- dispense-node-id
   "When a PARSE-CONTEXT is active, dispense one new (running) index."
-  []
-  (if-let [id (:current-node-id (last @parse-context))]
-    (do (update-in-parse-context :current-node-id inc)
-        id)
-    -1))
+  ([]
+   (if-let [id (:current-node-id (last @parse-context))]
+     (do (update-in-parse-context :current-node-id inc)
+         id)
+     -1))
+  ([node]
+   (if (other? node)
+     node
+     (merge node {:id (dispense-node-id)}))))
 
 (defn- resolve-other
   "Try to find the referenced node in the current PARSE-CONTEXT."
