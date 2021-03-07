@@ -152,20 +152,21 @@
 (defn- walk-node-args!
   [node]
   (let [connected-nodes (filter node-or-explicit-skip? (:args node))]
-       (when (not (empty? connected-nodes))
-         (doall (map-indexed (fn [i c] (when (node? c)
-                                         (add-element! (connection c (:id node) i))
-                                         (when-not (other? c) (walk-node! c))))
-                             connected-nodes)))))
+    (when (not (empty? connected-nodes))
+      (doall (map-indexed (fn [i c] (when (node? c) (add-element! (connection (walk-node! c) (:id node) i))))
+                          connected-nodes)))))
 
 (defn walk-node!
   "The main, recursive function responsible for adding nodes and connections to the PARSE-CONTEXT.
   Respects special cases for OTHER, INLET and OUTLET nodes."
   ([node]
-   (when (not (processed? node))
-     (record-as-processed node)
-     (add-element! (remove-node-args node))
-     (walk-node-args! node))))
+   (if (not (or (processed? node) (other? node))) ;; FIXME: don't return raw node but processed node with updated/processed id when findind processed node (introduce map of processed nodes instead of just set of ids)
+     (let [id-node (dispense-node-id node)]
+       (record-as-processed id-node)
+       (add-element! (remove-node-args id-node))
+       (walk-node-args! id-node)
+       id-node)
+     node)))
 
 (defmacro in-context
   "Set up fresh PARSE-CONTEXT, evaluate patch forms, return lines ready for translation."
@@ -193,7 +194,7 @@
                            [(second form) (drop 2 form)]
                            [{} (rest form)])
           op (op-from-kw (first form))
-          id (dispense-node-id)
+          id -1 ;;(dispense-node-id) FIXME: need to use unique id for determining if node was processed (user might bind a node and reuse it), but current implementation only assigns ids by walking the composed tree (not on first creation). this means that reuse of nodes requires use of `other`.
           parsed-args (mapv pd-single args)
           node {:type :node :op op :id id :options options :args parsed-args}]
       node)

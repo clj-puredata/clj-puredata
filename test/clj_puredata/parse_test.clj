@@ -1,6 +1,7 @@
 (ns clj-puredata.parse-test
   (:require [clj-puredata.parse :refer :all]
-            [clojure.test :refer :all]))
+            [clojure.test :refer :all]
+            [clojure.set :refer [subset?]]))
 
 (defn assure-no-context
   [f]
@@ -30,22 +31,15 @@
                                   :options {} :args [3 2]}
                                  1]})))
     (testing "will assign indices when wrapped in #'IN-CONTEXT."
-      (is (= (:nodes (in-context (pd [:+ 1 2 3])))
-             [{:type :node
-               :op "+" :id 0
-               :options {} :args [1 2 3]}])))
+      (is (subset? (set {:type :node :op "+" :id 0})
+                   (-> (in-context (pd [:+ 1 2 3])) :lines first set))))
     (testing "will assign indices recursively (depth-first, in left-to-right argument order)"
-      (is (= (:nodes (in-context (pd [:+ [:- [:*]] [:/]])))
-             [{:type :node
-               :op "+" :id 0
-               :options {} :args [{:type :node
-                                   :op "-" :id 1
-                                   :options {} :args [{:type :node
-                                                       :op "*" :id 2
-                                                       :options {} :args []}]}
-                                  {:type :node
-                                   :op "/" :id 3
-                                   :options {} :args []}]}])))
+      (is (every? identity (map #(subset? (set %1) (set %2))
+                                [{:op "+" :id 0}
+                                 {:op "-" :id 1}
+                                 {:op "*" :id 2}
+                                 {:op "/" :id 3}]
+                                (-> (in-context (pd [:+ [:- [:*]] [:/]])) :lines)))))
     (testing "intentionally preserves the indices of duplicate nodes in tree."
       (is (= (:nodes (in-context
                 (let [x (pd [:+])]
