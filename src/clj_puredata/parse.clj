@@ -8,18 +8,22 @@
   (atom []))
 
 (defn current-context
+  "Return last index found in `parse-context`."
   []
   (dec (count @parse-context)))
 
 (defn update-in-parse-context
+  "Update the most recent context in `parse-context`."
   [key & rest]
   (apply swap! parse-context update-in [(current-context) key] rest))
 
 (defn- processed?
+  "Check if the node is part of the set `:processed-node-ids`."
   [node]
   ((:processed-node-ids (last @parse-context)) (:id node)))
 
 (defn- record-as-processed
+  "Remember the NODE :id as processed inside the current context."
   [node]
   ;;(swap! parse-context update-in [(current-context) :processed-node-ids] conj (:id node))
   (update-in-parse-context :processed-node-ids conj (:id node)))
