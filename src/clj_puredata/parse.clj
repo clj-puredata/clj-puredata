@@ -143,25 +143,24 @@
    :to-node {:id to-id
              :inlet (:inlet from-node inlet)}})
 
-(declare walk-tree!)
-(defn- walk-node-args
+(declare walk-node!)
+(defn- walk-node-args!
   [node]
   (let [connected-nodes (filter node-or-explicit-skip? (:args node))]
        (when (not (empty? connected-nodes))
-         (doall (map-indexed (fn [i c] (when (node? c) (walk-tree! c (:id node) i)))
+         (doall (map-indexed (fn [i c] (when (node? c)
+                                         (add-element! (connection c (:id node) i))
+                                         (when-not (other? c) (walk-node! c))))
                              connected-nodes)))))
 
-(defn walk-tree!
+(defn walk-node!
   "The main, recursive function responsible for adding nodes and connections to the PARSE-CONTEXT.
   Respects special cases for OTHER, INLET and OUTLET nodes."
-  ([node parent-id inlet]
-   (add-element! (connection node parent-id inlet))
-   (when-not (other? node) (walk-tree! node)))
   ([node]
    (when (not (processed? node))
      (record-as-processed node)
      (add-element! (remove-node-args node))
-     (walk-node-args node))))
+     (walk-node-args! node))))
 
 (defmacro in-context
   "Set up fresh PARSE-CONTEXT, evaluate patch forms, return lines ready for translation."
@@ -169,7 +168,7 @@
   `(do
      (setup-parse-context)
      (let [nodes# (vector ~@forms)]
-       (doall (map walk-tree! (flatten nodes#)))
+       (doall (map walk-node! (flatten nodes#)))
        (resolve-all-other!)
        (let [lines# (-> (last @parse-context)
                         :lines
