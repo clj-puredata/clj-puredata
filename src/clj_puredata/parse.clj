@@ -4,6 +4,8 @@
             [clj-puredata.common :refer :all]
             [clj-puredata.layout :as l]))
 
+(defonce counter (atom 0))
+
 (def parse-context
   (atom []))
 
@@ -51,6 +53,10 @@
   [e]
   (update-in-parse-context :lines conj e)
   e)
+
+(defn- dispense-unique-id
+  []
+  (swap! counter inc))
 
 (defn- dispense-node-id
   "When a PARSE-CONTEXT is active, dispense one new (running) index."
@@ -194,9 +200,9 @@
                            [(second form) (drop 2 form)]
                            [{} (rest form)])
           op (op-from-kw (first form))
-          id -1 ;;(dispense-node-id) FIXME: need to use unique id for determining if node was processed (user might bind a node and reuse it), but current implementation only assigns ids by walking the composed tree (not on first creation). this means that reuse of nodes requires use of `other`.
+          unique-id (dispense-unique-id) ;; FIXME: need to use unique id for determining if node was processed (user might bind a node and reuse it), but current implementation only assigns ids by walking the composed tree (not on first creation). this means that reuse of nodes requires use of `other`. (pd 3/7/2021)
           parsed-args (mapv pd-single args)
-          node {:type :node :op op :id id :options options :args parsed-args}]
+          node {:type :node :op op :unique-id unique-id :options options :args parsed-args}]
       node)
     (literal? form) form
     (node? form) form
