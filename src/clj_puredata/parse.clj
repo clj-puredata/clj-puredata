@@ -154,9 +154,9 @@
    :from-node {:id (if (other? from-node)
                      from-node
                      (:id from-node))
-               :outlet (:outlet from-node 0)}
+               :outlet (:outlet from-node 0)} ; if :outlet is defined, use it, else use 0
    :to-node {:id to-id
-             :inlet (:inlet from-node inlet)}})
+             :inlet (:inlet from-node inlet)}}) ; if :inlet is defined, use it, else use INLET parameter (defaults to argument position)
 
 (declare walk-node!)
 (defn- walk-node-args!
