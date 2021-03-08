@@ -22,13 +22,17 @@
 (defn- processed?
   "Check if the node is part of the set `:processed-node-ids`."
   [node]
-  ((:processed-node-ids (last @parse-context)) (:id node)))
+  ((:processed-node-ids (last @parse-context)) (:unique-id node)))
+
+(defn- get-processed-id
+  [node]
+  (assoc node :id (processed? node)))
 
 (defn- record-as-processed
   "Remember the NODE :id as processed inside the current context."
   [node]
   ;;(swap! parse-context update-in [(current-context) :processed-node-ids] conj (:id node))
-  (update-in-parse-context :processed-node-ids conj (:id node)))
+  (update-in-parse-context :processed-node-ids assoc (:unique-id node) (:id node)))
 
 (defn- node-or-explicit-skip?
   "When determining the target inlet of a connection, the source nodes argument position is consulted.
@@ -40,7 +44,7 @@
 (defn setup-parse-context []
   (swap! parse-context conj {:current-node-id 0
                              :lines []
-                             :processed-node-ids #{}}))
+                             :processed-node-ids {}}))
 
 (defn teardown-parse-context []
   (try
@@ -166,13 +170,14 @@
   "The main, recursive function responsible for adding nodes and connections to the PARSE-CONTEXT.
   Respects special cases for OTHER, INLET and OUTLET nodes."
   ([node]
-   (if (not (or (processed? node) (other? node))) ;; FIXME: don't return raw node but processed node with updated/processed id when findind processed node (introduce map of processed nodes instead of just set of ids)
-     (let [id-node (dispense-node-id node)]
-       (record-as-processed id-node)
-       (add-element! (remove-node-args id-node))
-       (walk-node-args! id-node)
-       id-node)
-     node)))
+   (cond
+     (other? node) node
+     (processed? node) (get-processed-id node)
+     :else (let [id-node (dispense-node-id node)]
+             (record-as-processed id-node)
+             (add-element! (remove-node-args id-node))
+             (walk-node-args! id-node)
+             id-node))))
 
 (defmacro in-context
   "Set up fresh PARSE-CONTEXT, evaluate patch forms, return lines ready for translation."
