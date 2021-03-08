@@ -13,23 +13,16 @@
 (deftest constructing-the-tree
   (testing "The function PD"
     (testing "will expand hiccup [:+ 1 2] to maps {:type ::node ...}."
-      (is (= (pd [:+ 1 2 3])
-             {:type :node
-              :op "+" :id -1
-              :options {} :args [1 2 3]})))
+      (is (subset? (set {:type :node
+                         :op "+"
+                         :options {} :args [1 2 3]})
+                   (set (pd [:+ 1 2 3])))))
     (testing "will pass along maps in second position as options."
-      (is (= (pd [:+ {:an-option true} 1])
-             {:type :node
-              :op "+" :id -1
-              :options {:an-option true} :args [1]})))
+      (is (-> (pd [:+ {:an-option true}]) :options :an-option)))
     (testing "also works recursively."
-      (is (= (pd [:+ [:- 3 2] 1])
-             {:type :node
-              :op "+" :id -1
-              :options {} :args [{:type :node
-                                  :op "-" :id -1
-                                  :options {} :args [3 2]}
-                                 1]})))
+      (is (let [x (pd [:+ [:-]])]
+            (and (= (:op x) "+")
+                 (= (-> x :args first :op) "-")))))
     (testing "will assign indices when wrapped in #'IN-CONTEXT."
       (is (subset? (set {:type :node :op "+" :id 0})
                    (-> (in-context (pd [:+ 1 2 3])) :lines first set))))
@@ -41,13 +34,9 @@
                                  {:op "/" :id 3}]
                                 (-> (in-context (pd [:+ [:- [:*]] [:/]])) :lines)))))
     (testing "intentionally preserves the indices of duplicate nodes in tree."
-      (is (= (:nodes (in-context
-                (let [x (pd [:+])]
-                  (pd [:* x x]))))
-             [{:type :node
-               :op "*" :id 1
-               :options {} :args [{:type :node :op "+" :id 0 :options {} :args []}
-                                  {:type :node :op "+" :id 0 :options {} :args []}]}])))))
+      (is (let [x (pd [:+])
+                y (pd [:* x x])]
+            (apply = (map :unique-id (:args y))))))))
 
 (deftest walking-the-tree
   (testing "The function WALK-TREE"
