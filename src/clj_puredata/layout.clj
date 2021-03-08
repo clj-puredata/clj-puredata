@@ -101,7 +101,7 @@
         connections (filter connection? lines)
         ids (set (range (count nodes)))
         child-nodes (set (map #(get-in % [:to-node :id]) connections))
-        top-nodes (sort (clojure.set/difference ids child-nodes))] ;; FIXME: fails to find top node on completely circular patches (pd 3/7/2020)
+        top-nodes (sort (clojure.set/difference ids child-nodes))] ;; FIXME: fails to find top node on completely circular patches (pd 3/7/2021)
     (reset! visited-nodes [])
     (reset! min-col 0)
     (reset! node-map (into {} (map #(vector (:id %) %) nodes)))
