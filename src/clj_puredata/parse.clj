@@ -179,21 +179,21 @@
              (walk-node-args! id-node)
              id-node))))
 
-(defmacro in-context
+(defn in-context
   "Set up fresh PARSE-CONTEXT, evaluate patch forms, return lines ready for translation."
   [& forms]
-  `(do
-     (setup-parse-context)
-     (let [nodes# (vector ~@forms)]
-       (doall (map walk-node! (flatten nodes#)))
-       (resolve-all-other!)
-       (let [lines# (-> (last @parse-context)
-                        :lines
-                        l/layout-lines
-                        sort-lines)]
-         (teardown-parse-context)
-         {:nodes nodes#
-          :lines lines#}))))
+  (do
+    (setup-parse-context)
+    (let [nodes (apply vector forms)]
+      (doall (map walk-node! (flatten nodes)))
+      (resolve-all-other!)
+      (let [lines (-> (last @parse-context)
+                      :lines
+                      l/layout-lines
+                      sort-lines)]
+        (teardown-parse-context)
+        {:nodes nodes
+         :lines lines}))))
 
 (defn pd-single
   "Turn hiccup vectors into trees of node maps, ready to be walked by WALK-TREE!."
