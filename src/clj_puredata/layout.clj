@@ -1,4 +1,5 @@
 (ns clj-puredata.layout
+  "Rudimentary graph layouter for arranging nodes, to simplify debugging of generated patches. "
   (:require [clojure.set]
             [clj-puredata.common :refer :all]))
 
