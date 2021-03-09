@@ -58,7 +58,7 @@ Hiccup markup is used to create PureData nodes using [`pd`](functions.md#pd).
 
 ## Node
 
-Nodes are created from hiccup markup by [`pd`](functions.md#pd). They are further processed by `walk-node!` and put into a (Context)[#context] when passed to `in-context`.
+Nodes are created from hiccup markup by [`pd`](functions.md#pd). They are further processed by `walk-node!` and put into a [Context](#context) when passed to `in-context`.
 
 ##### Predicate
 
@@ -90,7 +90,7 @@ Nodes are created from hiccup markup by [`pd`](functions.md#pd). They are furthe
 
 ## Connection
 
-Connections are created by `walk-node-args!` and added to the `:lines` of a (Context)[#context] whenever two nodes that are connected are found during parsing.
+Connections are created by `walk-node-args!` and added to the `:lines` of a [Context](#context) whenever two nodes that are connected are found during parsing.
 
 ##### Content
 
