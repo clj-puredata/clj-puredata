@@ -25,6 +25,8 @@ This explains the main functions in detail. For a tutorial covering their interp
 
 ## Patch
 
+## Write
+
 ## Write-Patch
 
-## Write-Patch-Reloading
+## Write-Patch-Reload

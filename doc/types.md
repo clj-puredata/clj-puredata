@@ -1,5 +1,7 @@
 # Types and Data Structures
 
+## Table of Contents
+
 | User-Facing           | Internal                  |
 |-----------------------|---------------------------|
 | [Literals](#Literals) | [Node](#Node)             |
@@ -22,6 +24,8 @@ When literals are used as arguments in Nodes, they are passed (mostly) unchanged
     (char? arg)
     (nil? arg))
 ```
+
+[back to top](#table-of-contents)
 
 ## Hiccup
 
@@ -52,6 +56,7 @@ Hiccup markup is used to create PureData nodes using [`pd`](functions.md#pd).
      :unique-id 75,
      :options {:x 0, :y 0}}
 ```
+[back to top](#table-of-contents)
 
 ## Node
 
@@ -85,6 +90,8 @@ Nodes are created from hiccup markup by [`pd`](functions.md#pd). They are furthe
 => {:args [], :type :node, :op "float", :unique-id 71, :options {}}
 ```
 
+[back to top](#table-of-contents)
+
 ## Connection
 
 Connections are created by `walk-node-args!` and added to the `:lines` of a [Context](#context) whenever two nodes that are connected are found during parsing.
@@ -116,6 +123,8 @@ Connections are created by `walk-node-args!` and added to the `:lines` of a [Con
     :to-node {:id 0, :inlet 0}}
 ```
 
+[back to top](#table-of-contents)
+
 ## Lines
 
 Lines are a sorted vector consisting of [Nodes](#node) and [Connections](#connection). They are produced by [`lines`](functions.md#lines) and consumed by [`patch`](functions.md#patch).
@@ -130,6 +139,8 @@ Lines are a sorted vector consisting of [Nodes](#node) and [Connections](#connec
     {:type :connection, :from-node {:outlet 0, :id 1}, :to-node {:id 0, :inlet 0}}]
 ```
 
+[back to top](#table-of-contents)
+
 ## Context
 
 Context is created temporarily by `lines`, and discarded after it has finished. It might see future use when supporting subpatches (e.g. nested patches).
@@ -143,6 +154,9 @@ Context is created temporarily by `lines`, and discarded after it has finished. 
     :processed-node-ids {} ;; keys are <int> (`:unique-id` of Node), values are <int> (`:id` of Node)
 }
 ```
+
+[back to top](#table-of-contents)
+
 ## Patch
 
 ##### Example
@@ -154,6 +168,8 @@ A patch is represented internally as the list of Strings that make up the [File]
 
 => ("#N canvas 0 0 450 300 10;" "#X obj 5 5 +;")
 ```
+
+[back to top](#table-of-contents)
 
 ## File
 
@@ -168,3 +184,5 @@ As a return value, it is just the file contents as a single String.
 => "#N canvas 0 0 450 300 10;\n#X obj 5 5 +;"
 
 ```
+
+[back to top](#table-of-contents)
