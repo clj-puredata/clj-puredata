@@ -2,18 +2,18 @@
 
 ## Table of Contents
 
-| User-Facing               |
-|---------------------------|
-| [Literals](#Literals)     |
-| [Hiccup](#Hiccup)         |
-|---------------------------|
-| Internal                  |
-|---------------------------|
-| [Node](#Node)             |
-| [Connection](#Connection) |
-| [Lines](#Lines)           |
-| [Context](#Context)       |
-| [File](#File)             |
+| User-Facing           | Example                     |
+|-----------------------|-----------------------------|
+| [Literals](#Literals) | `123`, `"bang"`, `x`, `nil` |
+| [Hiccup](#Hiccup)     | `[:float 3 [:msg "bang"]]`  |
+
+| Internal                  | Example                                                                          |
+|---------------------------|----------------------------------------------------------------------------------|
+| [Node](#Node)             | `{:args ["bang"], :type :node, :op "msg", :unique-id 76, :options {}}`           |
+| [Connection](#Connection) | `{:type :connection, :from-node {:outlet 0, :id 1}, :to-node {:id 0, :inlet 0}}` |
+| [Lines](#Lines)           | `[<Node> \| <Connection>, ...]`                                                  |
+| [Context](#Context)       |                                                                                  |
+| [File](#File)             | `"#N canvas 0 0 450 300 10;\n#X obj 5 5 +;"`                                     |
 
 ## Literals
 
