@@ -30,12 +30,14 @@
 
 (deftest walking-the-tree
   (testing "The function LINES"
-    (testing "writes nodes out into the :LINES field of atom PARSE-CONTEXT."
+    (testing "writes nodes out sequentially"
       (is (= (count (lines (pd [:+] [:-])))
              2)))
     (testing "will assign successive indices."
-      (is (subset? (set {:type :node :op "+" :id 0})
-                   (-> (lines (pd [:+ 1 2 3])) first set))))
+      (is (every? identity (map #(subset? (set %1) (set %2))
+                                [{:op "+" :id 0}
+                                 {:op "-" :id 1}]
+                                (lines (pd [:+] [:-]))))))
     (testing "will assign indices recursively (depth-first, in left-to-right argument order)."
       (is (every? identity (map #(subset? (set %1) (set %2))
                                 [{:op "+" :id 0}
