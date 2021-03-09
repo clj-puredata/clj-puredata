@@ -2,13 +2,18 @@
 
 ## Table of Contents
 
-| User-Facing           | Internal                  |
-|-----------------------|---------------------------|
-| [Literals](#Literals) | [Node](#Node)             |
-| [Hiccup](#Hiccup)     | [Connection](#Connection) |
-|                       | [Lines](#Lines)           |
-|                       | [Context](#Context)       |
-|                       | [File](#File)             |
+| User-Facing               |
+|---------------------------|
+| [Literals](#Literals)     |
+| [Hiccup](#Hiccup)         |
+|---------------------------|
+| Internal                  |
+|---------------------------|
+| [Node](#Node)             |
+| [Connection](#Connection) |
+| [Lines](#Lines)           |
+| [Context](#Context)       |
+| [File](#File)             |
 
 ## Literals
 
