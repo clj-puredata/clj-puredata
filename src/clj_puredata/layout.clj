@@ -100,7 +100,7 @@
   [lines]
   (let [nodes (filter node? lines)
         connections (filter connection? lines)
-        ids (set (range (count nodes)))
+        ids (set (range (count nodes))) ;; assumes that node ids are dispensed sequentially, starting at 0
         child-nodes (set (map #(get-in % [:to-node :id]) connections))
         top-nodes (sort (clojure.set/difference ids child-nodes))] ;; FIXME: fails to find top node on completely circular patches (pd 3/7/2021)
     (reset! visited-nodes [])
