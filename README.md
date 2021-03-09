@@ -1,6 +1,7 @@
 # clj-puredata
 
 FIXME: description
+Check the [documentation](doc/intro.md).
 
 ## Roadmap
 

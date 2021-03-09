@@ -1,15 +1,12 @@
 # Types and Data Structures
 
-##### User-Facing
-
-- [Literals](#Literals)
-- [Hiccup](#Hiccup)
-
-##### Internal
-
-- [Node](#Node)
-- [Connection](#Connection)
-- [Context](#Context)
+| User-Facing           | Internal                  |
+|-----------------------|---------------------------|
+| [Literals](#Literals) | [Node](#Node)             |
+| [Hiccup](#Hiccup)     | [Connection](#Connection) |
+|                       | [Lines](#Lines)           |
+|                       | [Context](#Context)       |
+|                       | [File](#File)             |
 
 ## Literals
 
@@ -119,9 +116,23 @@ Connections are created by `walk-node-args!` and added to the `:lines` of a [Con
     :to-node {:id 0, :inlet 0}}
 ```
 
+## Lines
+
+Lines are a sorted vector consisting of [Nodes](#node) and [Connections](#connection). They are produced by [`lines`](functions.md#lines) and consumed by [`patch`](functions.md#patch).
+
+##### Example
+
+```clojure
+(lines (pd [:+ [:-]]))
+
+=> [{:args [], :type :node, :op "+", :col 0, :id 0, :unique-id 1, :options {:y 45, :x 5}, :auto-layout true, :row 1}
+    {:args [], :type :node, :op "-", :col 0, :id 1, :unique-id 2, :options {:y 5, :x 5}, :auto-layout true, :row 0}
+    {:type :connection, :from-node {:outlet 0, :id 1}, :to-node {:id 0, :inlet 0}}]
+```
+
 ## Context
 
-Context is created by `in-context` for further processing in 
+Context is created temporarily by `lines`, and discarded after it has finished. It might see future use when supporting subpatches (e.g. nested patches).
 
 ##### Content
 
@@ -132,5 +143,28 @@ Context is created by `in-context` for further processing in
     :processed-node-ids {} ;; keys are <int> (`:unique-id` of Node), values are <int> (`:id` of Node)
 }
 ```
+## Patch
 
 ##### Example
+
+A patch is represented internally as the list of Strings that make up the [File](#File) describing the patch when concatenated.
+
+```clojure
+(patch "example.pd" {} (lines (pd [:+])))
+
+=> ("#N canvas 0 0 450 300 10;" "#X obj 5 5 +;")
+```
+
+## File
+
+File is the actual file on disk, and also the return value of `write`, `write-patch` and `write-patch-reload`.
+As a return value, it is just the file contents as a single String.
+
+##### Example
+
+```clojure
+(write "example.pd" (patch "example.pd" {} (lines (pd [:+]))))
+
+=> "#N canvas 0 0 450 300 10;\n#X obj 5 5 +;"
+
+```
