@@ -179,23 +179,23 @@
              (walk-node-args! id-node)
              id-node))))
 
-(defn in-context
-  "Set up fresh PARSE-CONTEXT, evaluate patch forms, return lines ready for translation."
-  [& forms]
+(defn lines
+  "Set up fresh `parse-context`, evaluate NODES, return lines ready for translation.
+  Assumes NODES is a list."
+  [nodes]
+  (assert (seq? nodes))
   (do
     (setup-parse-context)
-    (let [nodes (apply vector forms)]
-      (doall (map walk-node! (flatten nodes)))
-      (resolve-all-other!)
-      (let [lines (-> (last @parse-context)
-                      :lines
-                      l/layout-lines
-                      sort-lines)]
-        (teardown-parse-context)
-        {:nodes nodes
-         :lines lines}))))
+    (doall (map walk-node! nodes))
+    (resolve-all-other!)
+    (let [lines (-> (last @parse-context)
+                    :lines
+                    l/layout-lines
+                    sort-lines)]
+      (teardown-parse-context)
+      lines)))
 
-(defn pd-single
+(defn- pd-single
   "Turn hiccup vectors into trees of node maps, ready to be walked by WALK-TREE!."
   [form]
   (cond
@@ -218,28 +218,38 @@
     :else (throw (Exception. (str "Not any recognizable form: " form)))))
 
 (defn pd
+  "Turn hiccup into nodes. Returns list of nodes."
   [& forms]
-  (let [r (doall (map pd-single forms))]
-    (if (> (count r) 1)
-      r
-      (first r))))
+  (doall (map pd-single forms)))
+
+(defn- assoc-node-or-hiccup
+  [node which n]
+  (assert (number? n))
+  (assert (or (hiccup? node)
+              (seq? node)
+              (node? node)))
+  (assoc (cond (hiccup? node) (first (pd node))
+               (seq? node) (first node)
+               (node? node) node)
+         which n))
 
 (defn outlet
-  "Use OUTLET to specify the intended outlet of a connection. 
-  E.g. `(pd [:+ (outlet (pd [:moses ...]) 1)])`. 
+  "Use OUTLET to specify the intended outlet of a connection.
+  The default outlet is 0, which is not always what you want.
+  Operates on hiccup or nodes.
+  `(pd [:+ (outlet [:moses ...] 1)])`
+  `(pd [:+ (outlet (pd [:moses ...]) 1)])
   The default outlet is 0."
-  [n node]
-  (assert (number? n))
-  (assoc (pd node) :outlet n))
+  [node n]
+  (assoc-node-or-hiccup node :outlet n))
 
 (defn inlet
   "Use INLET to specify the intended inlet for a connection.
   E.g. `(pd [:/ 1 (inlet (pd ...) 1)])`. The default inlet is determined
   by the source node argument position (not counting literals, only
   NIL and other nodes) (e.g. 0 in the previous example)."
-  [n node]
-  (assert (number? n))
-  (assoc (pd node) :inlet n))
+  [node n]
+  (assoc-node-or-hiccup node :inlet n))
 
 (defn other
   "An OTHER is a special node that refers to another node.

@@ -6,8 +6,9 @@
   types to make sure all necessary keywords are present for filling
   the templates."
   (:require [clojure.string :as string]
-            [clj-puredata.parse :refer [in-context]]
-            [clj-puredata.comms :refer [reload]]))
+            [clj-puredata.parse :refer [lines]]
+            [clj-puredata.comms :refer [reload]]
+            [clj-puredata.common :refer :all]))
 
 (def obj-nodes
   "Set of default node types ('obj') available in PureData 0.47 (Vanilla)."
@@ -299,15 +300,18 @@
   [file lines]
   (spit file (string/join "\n" lines)))
 
-(defmacro with-patch
+(defn with-patch
   [name options & rest]
-  (let [[patch forms] (if (map? options)
+  (assert (string? name))
+  (let [[patch forms] (if (and (map? options)
+                               (not (node? options)))
                         [(merge patch-defaults options) rest]
                         [patch-defaults (cons options rest)])]
-    `(let [lines# (->> (in-context ~@forms)
-                       :lines
-                       (wrap-lines ~patch)
-                       (move-layout ~patch))
-           out# (map translate-line lines#)]
-       (write-patch ~name out#)
-       (reload))))
+    (let [lines (->> (lines forms)
+                     (wrap-lines patch)
+                     (move-layout patch))
+          out (map translate-line lines)]
+      ;;(write-patch name out)
+      ;;(reload)
+      out
+      )))
