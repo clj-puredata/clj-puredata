@@ -6,8 +6,8 @@
   types to make sure all necessary keywords are present for filling
   the templates."
   (:require [clojure.string :as string]
-            [clj-puredata.parse :refer [lines]]
-            [clj-puredata.comms :refer [reload]]
+            [clj-puredata.parse :refer [lines pd]]
+            [clj-puredata.puredata :refer [reload-all-patches]]
             [clj-puredata.common :refer :all]))
 
 (def obj-nodes
@@ -296,22 +296,42 @@
           lines)
     lines))
 
-(defn write-patch
-  [file lines]
-  (spit file (string/join "\n" lines)))
+(defn patch
+  "Turns LINES into translated and layouted patch, e.g. the actual strings of the resulting PureData file."
+  [name options lines]
+  (assert (and (string? name)
+               (map? options)
+               (every? #(or (node? %) (connection? %)) lines)))
+  (let [options_ (merge patch-defaults options)]
+    (->> lines
+         (wrap-lines options_)
+         (move-layout options_)
+         (map translate-line))))
 
-(defn with-patch
+(defn write
+  [name patch]
+  (let [output (string/join "\n" patch)]
+    (spit name output)
+    output))
+
+(defn write-patch
+  "Assumes hiccup input for REST."
+  ([name options & rest]
+   (assert (string? name))
+   (let [[options_ forms] (if (and (map? options) (not (node? options)))
+                            [options rest]
+                            [{} (cons options rest)])]
+     (->> forms
+          (apply pd)
+          lines
+          (patch name options_)
+          (write name))))
+  ([name]
+   (write-patch name {})))
+
+(defn write-patch-reload
+  "Utility function that automatically reloads all patches on evaluation.
+  Patches have to be registered through LOAD-PATCHES or STARTUP beforehand."
   [name options & rest]
-  (assert (string? name))
-  (let [[patch forms] (if (and (map? options)
-                               (not (node? options)))
-                        [(merge patch-defaults options) rest]
-                        [patch-defaults (cons options rest)])]
-    (let [lines (->> (lines forms)
-                     (wrap-lines patch)
-                     (move-layout patch))
-          out (map translate-line lines)]
-      ;;(write-patch name out)
-      ;;(reload)
-      out
-      )))
+  (apply write-patch name options rest)
+  (reload-all-patches))
