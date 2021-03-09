@@ -2,15 +2,24 @@
 
 ## Literal
 
+Numbers, Strings, Chars and NIL are considered literals.
+When literals are used as arguments in Nodes, they are passed (mostly) unchanged into PureData file format.
+(Exception: `nil` is used to skip a positional argument.)
+
+##### Predicate
+
 ```clojure
 (or (number? arg)
     (string? arg)
     (char? arg)
     (nil? arg))
 ```
+
 ## Hiccup
 
-Hiccup markup is used to create PureData nodes using [[pd]].
+Hiccup markup is used to create PureData nodes using [`pd`](functions.md#pd).
+
+##### Predicate
 
 ```clojure
 (and (vector? form)
@@ -20,16 +29,16 @@ Hiccup markup is used to create PureData nodes using [[pd]].
 
 ## Node
 
-Nodes are created from hiccup markup by using [[pd]].
+Nodes are created from hiccup markup by the `pd` command.
 
-### Predicate
+##### Predicate
 
 ```clojure
 (and (map? arg)
      (= (:type arg) :node))
 ```
 
-### Example
+##### Content
 
 ```clojure
 {
@@ -43,6 +52,8 @@ Nodes are created from hiccup markup by using [[pd]].
 ```
 
 ## Connection
+
+##### Content
 
 ```clojure
 {
