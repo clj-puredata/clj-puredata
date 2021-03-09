@@ -5,15 +5,15 @@ This explains the main functions in detail. For a tutorial covering their interp
 hiccup -> pd -> nodes
 
 hiccup -> context -> context
-nodes -> context -> context
+nodes -> lines -> lines
 
 hiccup -> patch -> patch
 nodes -> patch -> patch
-context -> patch -> patch
+lines -> patch -> patch
 
 hiccup -> write-patch -> nil
 nodes -> write-patch -> nil
-context -> write-patch -> nil
+lines -> write-patch -> nil
 
 ## PD
 
