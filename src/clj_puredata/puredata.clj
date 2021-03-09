@@ -45,13 +45,13 @@
     (send-to-pd "/reload" file-name dir)))
 
 (defn reload-all-patches
-  "Reloads all patches registered with LOAD-PATCHES."
+  "Reloads all patches registered with `load-patches`."
   []
   (doseq [p @reload-targets]
     (reload-patch p)))
 
 (defn load-patches
-  "Registers the patches to be reloaded after _any_ WRITE-PATCH-RELOAD is called."
+  "Registers the patches to be reloaded when `write-patch-reload` or `reload-all-patches` is called."
   [& filenames]
   (apply swap! reload-targets conj filenames)
   (reload-all-patches))

@@ -2,12 +2,12 @@
 
 ## Table of Contents
 
-| User-Facing           | Example                     |
+| User-Facing Types     | Example                     |
 |-----------------------|-----------------------------|
 | [Literals](#Literals) | `123`, `"bang"`, `x`, `nil` |
 | [Hiccup](#Hiccup)     | `[:float 3 [:msg "bang"]]`  |
 
-| Internal                  | Example                                                                          |
+| Internal Types            | Example                                                                          |
 |---------------------------|----------------------------------------------------------------------------------|
 | [Node](#Node)             | `{:args ["bang"], :type :node, :op "msg", :unique-id 76, :options {}}`           |
 | [Connection](#Connection) | `{:type :connection, :from-node {:outlet 0, :id 1}, :to-node {:id 0, :inlet 0}}` |
