@@ -4,7 +4,7 @@
 
 Numbers, Strings, Chars and NIL are considered literals.
 When literals are used as arguments in Nodes, they are passed (mostly) unchanged into PureData file format.
-(Exception: `nil` is used to skip a positional argument.)
+Exception: `nil` is used to skip a positional argument. Strings are escaped (notably `;` and `,`) by [`to-string`](../src/clj_puredata/translate.clj#L157)
 
 ##### Predicate
 
