@@ -9,12 +9,12 @@
 (def parse-context
   (atom []))
 
-(defn current-context
+(defn- current-context
   "Return last index found in `parse-context`."
   []
   (dec (count @parse-context)))
 
-(defn update-in-parse-context
+(defn- update-in-parse-context
   "Update the most recent context in `parse-context`."
   [key & rest]
   (apply swap! parse-context update-in [(current-context) key] rest))
@@ -83,7 +83,7 @@
       (throw (Exception. (str "Cannot resolve other node " other)))
       solve)))
 
-(defn resolve-all-other!
+(defn- resolve-all-other!
   "Resolve references to OTHER nodes in connections with the actual node ids.
   Called by IN-CONTEXT once all nodes have been walked."
   []
@@ -123,7 +123,7 @@
       (mapv (partial assoc-layout (v/layout-graph v/image-dim edges {} true))
             lines))))
 
-(defn sort-lines
+(defn- sort-lines
   [lines]
   (->> lines
        (sort-by :id)
@@ -166,7 +166,7 @@
       (doall (map-indexed (fn [i c] (when (node? c) (add-element! (connection (walk-node! c) (:id node) i))))
                           connected-nodes)))))
 
-(defn walk-node!
+(defn- walk-node!
   "The main, recursive function responsible for adding nodes and connections to the PARSE-CONTEXT.
   Respects special cases for OTHER, INLET and OUTLET nodes."
   ([node]
@@ -183,7 +183,8 @@
   "Set up fresh `parse-context`, evaluate NODES, return lines ready for translation.
   Assumes NODES is a list."
   [nodes]
-  (assert (seq? nodes))
+  (assert (and (seq? nodes)
+               (every? node? nodes)))
   (do
     (setup-parse-context)
     (doall (map walk-node! nodes))
@@ -277,6 +278,6 @@
   (pd [:float {:name 'f} [:msg \"bang\"] (other '+)])
   (pd [:+ {:name '+} 1 (other 'f)])
   ```"
-  [name]
+  [reference]
   {:type :node
-   :other name})
+   :other reference})
