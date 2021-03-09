@@ -20,16 +20,12 @@
   reload-all-patches
   startup])
 
-(comment
-  ;; 1 - create a basic patch using WITH-PATCH.
-  (with-patch "test.pd"
-    {:width 800 :height 800}
-    (pd [:text "Hello World"]))
-  ;; 2 - open PureData.
+(defn basic-usage []
   (open-pd)
   (Thread/sleep 3000)
-  ;; 3 - load your patch.
-  (load-patch "test.pd")
+  ;;(load-patch "test.pd")
+  (write-patch-reload "test.pd"
+    [:text "Hello World"])
   ;; 4 - now edit the original WITH-PATCH, evaluate it, and see PureData update accordingly.
   ;; 5 - rinse and repeat.
-  ) 
+  )
