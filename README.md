@@ -1,7 +1,37 @@
 # clj-puredata
 
-FIXME: description
-Check the [documentation](doc/intro.md).
+clj-puredata generates [PureData](https://puredata.info/) patches using [Clojure](https://clojure.org/).
+
+Check the [documentation](doc/intro.md), especially the [Tutorial](doc/tutorial.md).
+
+## Installation
+
+Using Leiningen/Boot: `[clj-puredata "0.1.0-SNAPSHOT"]`
+
+## Usage
+
+This will create a `counter.pd` patch, use it in a `usage.pd` patch, and start PureData with that patch.
+
+```clojure
+(ns example.core
+  (:require [clj-puredata.core :refer :all]))
+    
+(write-patch "counter.pd"
+             [:outlet [:float {:name 'the-float}
+                       0
+                       [:b [:inlet]]
+                       [:+ 1 (other 'the-float)]]])
+
+(write-patch-reload "usage.pd"
+                    [:print "count"
+                     ["counter.pd"
+                      [:msg "bang"]]])
+
+(startup "usage.pd")
+```
+
+Check the [Documentation](doc/intro.md), especially the [Tutorial](doc/tutorial.md).
+
 
 ## Roadmap
 
@@ -11,33 +41,17 @@ Check the [documentation](doc/intro.md).
 - [x] layout engine: uses ascii dims, maybe nicer with image dims?
 - [x] layout engine: don't overwrite nodes that already have :x or :y set.
 - [x] layout engine: push auto-layouted nodes down (so they're outside the graph-on-parent frame).
-- [ ] missing node types: float, symbol, sliders/buttons etc.
+- [x] missing node types: float, symbol, sliders/buttons etc.
 - [x] finish patch footer template for "graph on parent" options.
 - [x] patches (e.g. ["patch.pd" ...] should be recognized).
+- [x] remove the need for explicit PD anywhere - make it implicit in WITH-PATCH, INLET, OUTLET, OTHER.
 - [ ] subpatches (needs multiple parsing contexts? e.g. map of context instead of single atom)
-- [ ] remove the need for explicit PD anywhere - make it implicit in WITH-PATCH, INLET, OUTLET, OTHER.
+- [ ] helpers for coloring ui-nodes (copy from cl-pd)
 
-## Installation
-
-Download from http://example.com/FIXME.
-
-## Usage
-
-FIXME: explanation
-
-    $ java -jar clj-puredata-0.1.0-standalone.jar [args]
-
-## Examples
-
-...
-
-### Bugs
-
-...
 
 ## License
 
-Copyright © 2017 Philipp Dikmann
+Copyright © 2021 Philipp Dikmann
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
