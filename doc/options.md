@@ -1,5 +1,17 @@
 # List of supported Options
 
+- [Patch Options](#patch-options)
+- [Node Options](#node-options)
+  - [Common Options](#common-options)
+  - [Atom Options](#atom-options)
+  - [UI Options](#ui-options)
+  - [Bang Options](#bang-options)
+  - [Toggle Options](#toggle-options)
+  - [Slider Options](#slider-options)
+  - [Canvas Options](#canvas-options)
+  
+[Back to Index](index.md)  
+
 ## Patch Options
 
 These options are supported as the second argument to `write-patch`, `write-patch-reload` and `patch`.
