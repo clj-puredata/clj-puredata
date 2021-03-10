@@ -5,6 +5,7 @@ TODO: write [great documentation](http://jacobian.org/writing/what-to-write/)
 ## Contents
 
 | File                                  | Contents                         |
+|---------------------------------------|----------------------------------|
 | [Index](index.md)                     | This.                            |
 | [Tutorial](tutorial.md)               | Tutorial                         |
 | [Main Functions](functions.md)        | Main functions                   |
