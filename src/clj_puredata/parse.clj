@@ -213,11 +213,12 @@
       node)
     (literal? form) form
     (node? form) form
+    (map? form) (throw (Exception. (str "Parser encountered map that is a) not a node and b) not an options map (e.g. not the second element in a hiccup vector): " form)))
     (fn? form) (form)
     (or (list? form)
         (vector? form)
         (seq? form)) (doall (map pd-single form))
-    :else (throw (Exception. (str "Not any recognizable form: " form)))))
+    :else (throw (Exception. (str "Parser does not recognize form: " form)))))
 
 (defn pd
   "Turn hiccup into nodes. Returns single node or list of nodes depending on input."
