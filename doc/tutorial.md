@@ -36,6 +36,16 @@ Basic Usage - Hiccup, Writing
              [:+ 1 (inlet (outlet [:select 3] 1) 1)])      ; `inlet` and `outlet` can be combined.
 ```
 
+### Other
+
+```clojure
+(write-patch "other.pd"
+             [:loadbang {:name 'lb}]                      ; Giving Nodes a `:name` allows them to be referenced by `other`.
+             [:print "loaded!" (other 'lb)]
+             [:print "zero" (other 'm)]                   ; The named Node can be defined later, too.
+             [:print "one or more" (outlet (other 'm) 1)] ; `inlet` and `outlet` also work with `other`.
+             [:moses {:name 'm} 1])
+```
 
 Advanced Usage - Live Reloading
 Patch Options list

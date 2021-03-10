@@ -9,32 +9,29 @@
   - [Toggle Options](#toggle-options)
   - [Slider Options](#slider-options)
   - [Canvas Options](#canvas-options)
-  
-[Back to Index](index.md)  
+
+[Back to Index](index.md)
 
 ## Patch Options
 
 These options are supported as the second argument to `write-patch`, `write-patch-reload` and `patch`.
 
-| window properties | default |
-|-------------------|---------|
-| `:x`              | 0       |
-| `:y`              | 0       |
-| `:width`          | 450     |
-| `:height`         | 300     |
-
-| graph properties    | default |
-|---------------------|---------|
-| `:graph-on-parent`  | false   |
-| `:hide-object-name` | false   |
-| `:view-width`       | 85      |
-| `:view-height`      | 60      |
-| `:view-margin-x`    | 0       |
-| `:view-margin-y`    | 0       |
-| `:x-range-min`      | 0       |
-| `:x-range-max`      | 100     |
-| `:y-range-min`      | 1       |
-| `:y-range-max`      | -1      |
+| window properties   | default |                              |
+|---------------------|---------|------------------------------|
+| `:x`                | 0       | window position, horizontal  |
+| `:y`                | 0       | window position, vertical    |
+| `:width`            | 450     | window width                 |
+| `:height`           | 300     | window height                |
+| `:graph-on-parent`  | false   |                              |
+| `:hide-object-name` | false   |                              |
+| `:view-width`       | 85      | width of visible graph area  |
+| `:view-height`      | 60      | height of visible graph area |
+| `:view-margin-x`    | 0       |                              |
+| `:view-margin-y`    | 0       |                              |
+| `:x-range-min`      | 0       |                              |
+| `:x-range-max`      | 100     |                              |
+| `:y-range-min`      | 1       |                              |
+| `:y-range-max`      | -1      |                              |
 
 ##### Example
 
@@ -101,11 +98,11 @@ Supported in: `bng`
 
 ##### Toggle Options
 
-| option           | default | comment                                        |
-|------------------|---------|------------------------------------------------|
-| `:init`          | 0       | is node value initialized when patch is loaded |
-| `:init-value`    | 0       | value the node is initialized to               |
-| `:nonzero-value` | 1       | value emitted when toggle is on                |
+| option           | default | comment                                                                        |
+|------------------|---------|--------------------------------------------------------------------------------|
+| `:init`          | 0       | is node value initialized when patch is loaded                                 |
+| `:init-value`    | 0       | if 0, node is initialized to 0. else, node is initialized to `:nonzero-value`. |
+| `:nonzero-value` | 1       | value emitted when toggle is on                                                |
 
 Supported in: `tgl`
 
