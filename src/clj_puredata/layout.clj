@@ -56,7 +56,7 @@
 (defn column-indentations
   []
   (let [cols (group-by :col (vals @node-map))
-        node-name-len #(count (clojure.string/join " " (cons (:op %) (:args %))))
+        node-name-len #(max 5 (inc (count (clojure.string/join " " (cons (:op %) (:args %))))))
         col-lens (for [n (range (count cols)) :let [col (cols n)]] ;; assure correct order
                    (apply max (map node-name-len col)))
         col-indents (reduce (fn [a b] (conj a (+ (last a) b)))
