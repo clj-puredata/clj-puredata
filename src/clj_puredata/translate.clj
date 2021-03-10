@@ -51,6 +51,9 @@
 (def slider-nodes
   #{"hsl" "vsl"})
 
+(def cnv-node
+  #{"cnv"})
+
 (def common-node-defaults
   "Super ultra lowest common denominator."
   {:x 0 :y 0})
@@ -81,6 +84,16 @@
           :label-color -1
           :size 15}))
 
+(def cnv-node-default
+  (merge ui-node-defaults
+         {:width 100
+          :height 60
+          :label-x 20
+          :label-y 12
+          :font-size 14
+          :bg-color -233017
+          :fg-color -66577}))
+
 (def slider-node-defaults
   (merge ui-node-defaults
          {:width 15
@@ -98,6 +111,7 @@
    self-nodes common-node-defaults
    floatatom-node (merge atom-node-defaults {:width 5})
    symbolatom-node (merge atom-node-defaults {:width 10})
+   cnv-node cnv-node-default
    bng-node (merge ui-node-defaults {:hold 250 :interrupt 50 :init 0})
    tgl-node (merge ui-node-defaults {:init 0 :init-value 0  :nonzero-value 1})
    slider-nodes slider-node-defaults})
@@ -109,7 +123,8 @@
    atom-nodes ["#X" :op :x :y :width :lower-limit :upper-limit :label-pos :label-text :receive-symbol :send-symbol]
    bng-node ["#X obj" :x :y :op :size :hold :interrupt :init :send-symbol :receive-symbol :label-text :label-x :label-y :font-family :font-size :bg-color :fg-color :label-color]
    tgl-node ["#X obj" :x :y :op :size :init :send-symbol :receive-symbol :label-text :label-x :label-y :font-family :font-size :bg-color :fg-color :label-color :init-value :nonzero-value]
-   slider-nodes ["#X obj" :x :y :op :width :height :bottom :top :log :init :send-symbol :receive-symbol :label-text :label-x :label-y :font-family :font-size :bg-color :fg-color :label-color :default :steady-on-click]})
+   slider-nodes ["#X obj" :x :y :op :width :height :bottom :top :log :init :send-symbol :receive-symbol :label-text :label-x :label-y :font-family :font-size :bg-color :fg-color :label-color :default :steady-on-click]
+   cnv-node ["#X obj" :x :y :op :size :width :height :send-symbol :receive-symbol :label-text :label-x :label-y :font-family :font-size :bg-color :fg-color :label-color]})
 
 (def connection-template ["#X" "connect"
                           [:from-node :id]
