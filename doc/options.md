@@ -38,24 +38,24 @@ These options are supported as the second item in [hiccup syntax](types.md#hiccu
 
 ##### Common Options
 
-| option | default |
-|--------|---------|
-| `:x`     | 0       |
-| `:y`     | 0       |
+| option | default | comment                  |
+|--------|---------|--------------------------|
+| `:x`   | 0       | horizontal node position |
+| `:y`   | 0       | vertical node position   |
 
 Supported in: _all_ nodes
 
 ##### Atom Options
 
-| option            | default | comment |
-|-------------------|---------|---------|
-| `:send-symbol`    | "-"     |         |
-| `:receive-symbol` | "-"     |         |
-| `:label-text`     | "-"     |         |
-| `:label-pos`      | 0       |         |
-| `:width`          | 5       |         |
-| `:lower-limit`    | 0       |         |
-| `:upper-limit`    | 0       |         |
+| option            | default | comment                                      |
+|-------------------|---------|----------------------------------------------|
+| `:send-symbol`    | "-"     |                                              |
+| `:receive-symbol` | "-"     |                                              |
+| `:label-text`     | "-"     |                                              |
+| `:label-pos`      | 0       | 0 is left, 1 is right, 2 is top, 3 is bottom |
+| `:width`          | 5       | node width                                   |
+| `:lower-limit`    | 0       |                                              |
+| `:upper-limit`    | 0       |                                              |
 
 Supported in: `floatatom`, `symbolatom`
 
@@ -75,7 +75,7 @@ Supported in: `floatatom`, `symbolatom`
 | `:label-color`    | -1      |         |
 | `:size`           | 15      |         |
 
-Supported in: `bng`, `tgl`, `cnv`, `hsl`, `vsl`
+Supported in: `bng`, `tgl`, `hsl`, `vsl`
 
 ##### Bang Options
 
@@ -110,3 +110,17 @@ Supported in: `tgl`
 | `:steady-on-click` | 1       |                                                |
 
 Supported in: `hsl`, `vsl`
+
+##### Canvas Options
+
+| option       | default | comment |
+|--------------|---------|---------|
+| `:width`     | 100     |         |
+| `:height`    | 60      |         |
+| `:label-x`   | 20      |         |
+| `:label-y`   | 12      |         |
+| `:font-size` | 14      |         |
+| `:bg-color`  | -233017 |         |
+| `:fg-color`  | -66577  |         |
+
+Supported in: `cnv`
