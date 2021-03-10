@@ -27,6 +27,8 @@ Basic Usage - Hiccup, Writing
               [:msg 3]])    ; Connected to third inlet.
 ```
 
+![arguments](img/arguments.png)
+
 ### Node Options
 
 You can find supported node options in the [List of supported Options](options.md#node-options).
@@ -35,6 +37,8 @@ You can find supported node options in the [List of supported Options](options.m
 (write-patch "node-options.pd"
              [:tgl {:init 1 :init-value 0 :nonzero-value 100}]) ; options are passed as maps, and always come in second place 
 ```
+
+![node options](img/node-options.png)
 
 ### Inlet and Outlet
 
@@ -47,6 +51,8 @@ You can find supported node options in the [List of supported Options](options.m
              [:+ 1 (inlet (outlet [:select 3] 1) 1)])      ; `inlet` and `outlet` can be combined.
 ```
 
+![inlet and outlet](img/inlet-and-outlet.png)
+
 ### Other
 
 ```clojure
@@ -57,6 +63,8 @@ You can find supported node options in the [List of supported Options](options.m
              [:print "one or more" (outlet (other 'm) 1)] ; `inlet` and `outlet` also work with `other`.
              [:moses {:name 'm} 1])
 ```
+
+![other](img/other.png)
 
 Patch Options list
 Supported Nodes
