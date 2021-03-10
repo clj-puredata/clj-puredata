@@ -38,8 +38,6 @@ You can find supported node options in the [List of supported Options](options.m
              [:tgl {:init 1 :init-value 0 :nonzero-value 100}]) ; options are passed as maps, and always come in second place 
 ```
 
-![node options](img/node-options.png)
-
 ### Inlet and Outlet
 
 ```clojure
