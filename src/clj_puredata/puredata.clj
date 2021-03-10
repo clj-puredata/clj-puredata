@@ -38,7 +38,7 @@
   (try (apply osc-send @pd-osc-client target strings)
        (catch Exception e (str "Unable to send osc message to pd:" (.getMessage e)))))
 
-(defn- reload-patch [patch-file-name]
+(defn reload-patch [patch-file-name]
   (let [file (clojure.java.io/file patch-file-name)
         file-name (.getName file)
         dir (.getPath (.getParentFile (.getAbsoluteFile file)))]
