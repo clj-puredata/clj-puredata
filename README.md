@@ -49,6 +49,10 @@ Check the [Documentation](doc/intro.md), especially the [Tutorial](doc/tutorial.
 - [x] remove the need for explicit PD anywhere - make it implicit in WITH-PATCH, INLET, OUTLET, OTHER.
 - [ ] subpatches (needs multiple parsing contexts? e.g. map of context instead of single atom)
 - [ ] helpers for coloring ui-nodes (copy from cl-pd)
+- [ ] `connect` function & supporting data structure for adding connections after node creation
+- [ ] layouter should sort node arguments by inlet number (instead of argument position)
+- [ ] DEBUG: do `inlet` and `outlet` work on `other`???
+- [ ] add support for `:left`, `:right`, `:first`, `:second`, etc. as arguments to `inlet` or `outlet`
 
 
 ## License
