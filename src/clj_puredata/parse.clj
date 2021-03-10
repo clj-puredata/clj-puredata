@@ -183,11 +183,12 @@
   "Set up fresh `parse-context`, evaluate NODES, return lines ready for translation.
   Assumes NODES is a list."
   [nodes]
-  (assert (and (seq? nodes)
-               (every? node? nodes)))
+  (assert (or (node? nodes)
+              (and (seq? nodes)
+                   (every? node? nodes))))
   (do
     (setup-parse-context)
-    (doall (map walk-node! nodes))
+    (doall (map walk-node! (if (seq? nodes) nodes (vector nodes))))
     (resolve-all-other!)
     (let [lines (-> (last @parse-context)
                     :lines
@@ -219,9 +220,12 @@
     :else (throw (Exception. (str "Not any recognizable form: " form)))))
 
 (defn pd
-  "Turn hiccup into nodes. Returns list of nodes."
+  "Turn hiccup into nodes. Returns single node or list of nodes depending on input."
   [& forms]
-  (doall (map pd-single forms)))
+  (let [r (doall (map pd-single forms))]
+    (if (> (count r) 1)
+      r
+      (first r))))
 
 (defn- assoc-node-or-hiccup
   [node which n]
@@ -242,7 +246,10 @@
   `(pd [:+ (outlet (pd [:moses ...]) 1)])
   The default outlet is 0."
   [node n]
-  (assoc-node-or-hiccup node :outlet n))
+  (assert (or (node? node)
+              (hiccup? node)))
+  (assert (number? n))
+  (assoc-node-or-hiccup (if (node? node) node (pd node)) :outlet n))
 
 (defn inlet
   "Use INLET to specify the intended inlet for a connection.
@@ -250,7 +257,10 @@
   by the source node argument position (not counting literals, only
   NIL and other nodes) (e.g. 0 in the previous example)."
   [node n]
-  (assoc-node-or-hiccup node :inlet n))
+  (assert (or (node? node)
+              (hiccup? node)))
+  (assert (number? n))
+  (assoc-node-or-hiccup (if (node? node) node (pd node)) :inlet n))
 
 (defn other
   "An OTHER is a special node that refers to another node.

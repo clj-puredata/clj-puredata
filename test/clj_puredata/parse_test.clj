@@ -16,16 +16,16 @@
       (is (subset? (set {:type :node
                          :op "+"
                          :options {} :args [1 2 3]})
-                   (set (first (pd [:+ 1 2 3]))))))
+                   (set (pd [:+ 1 2 3])))))
     (testing "will pass along maps in second position as options."
-      (is (-> (pd [:+ {:an-option true}]) first :options :an-option)))
+      (is (-> (pd [:+ {:an-option true}]) :options :an-option)))
     (testing "also works recursively."
-      (is (let [x (first (pd [:+ [:-]]))]
+      (is (let [x (pd [:+ [:-]])]
             (and (= (:op x) "+")
                  (= (-> x :args first :op) "-")))))
     (testing "intentionally preserves the indices of duplicate nodes in tree."
-      (is (let [x (first (pd [:+]))
-                y (first (pd [:* x x]))]
+      (is (let [x (pd [:+])
+                y (pd [:* x x])]
             (apply = (map :unique-id (:args y))))))))
 
 (deftest walking-the-tree
