@@ -2,6 +2,8 @@
 
 This explains the main functions in detail. For a tutorial covering their interplay, see the [Tutorial](tutorial.md).
 
+[Back to Index](index.md)
+
 ## Table of Contents
 
 ##### User-Facing Functions

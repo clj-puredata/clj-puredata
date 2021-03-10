@@ -3,7 +3,7 @@
 clj-puredata generates [PureData](https://puredata.info/) patches using [Clojure](https://clojure.org/).
 It supports live reloading, has a simple layouter that automatically arranges the generated patches
 
-Check the [documentation](doc/intro.md), especially the [Tutorial](doc/tutorial.md).
+Check the [documentation](doc/index.md), especially the [Tutorial](doc/tutorial.md).
 
 ## Installation
 

@@ -1,5 +1,7 @@
 # Types and Data Structures
 
+[Back to Index](index.md)
+
 ## Table of Contents
 
 | User-Facing Types     | Example                     |
@@ -40,7 +42,7 @@ The syntax is `[operator options? arguments*]`:
 | position    | type                   | example                     | how many   |
 |-------------|------------------------|-----------------------------|------------|
 | `operator`  | keyword                | `:+`                        | exactly 1  |
-| `options?`  | map                    | `{:x 10}`                   | 1 or none  |
+| `options?`  | map                    | `{:x 10 :y 10}`             | 1 or none  |
 | `arguments` | literal or more hiccup | `123`, `"bang"`, `[:- 3 4]` | any number |
 
 Or, shown differently:
