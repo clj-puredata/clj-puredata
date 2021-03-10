@@ -35,6 +35,27 @@ When literals are used as arguments in Nodes, they are passed (mostly) unchanged
 ## Hiccup
 
 Hiccup markup is used to create PureData nodes using [`pd`](functions.md#pd).
+The syntax is `[operator options? arguments*]`:
+
+| position    | type                   | example                     | how many   |
+|-------------|------------------------|-----------------------------|------------|
+| `operator`  | keyword                | `:+`                        | exactly 1  |
+| `options?`  | map                    | `{:x 10}`                   | 1 or none  |
+| `arguments` | literal or more hiccup | `123`, `"bang"`, `[:- 3 4]` | any number |
+
+Or, shown differently:
+
+```
+<hiccup> ::= "[" <operator> " " <options-maybe> <arguments-maybe> "]"
+<options-maybe> ::= <options> | ""
+<options> ::= "{" <key-value-pair-maybe> "}"
+<key-value-pair-maybe> ::= <key-value-pair> | <key-value-pair> <key-value-pair-maybe> | ""
+<key-value-pair> ::= <key> " " <value>
+<key> ::= ":" <string>
+<value> ::= <literal>
+<arguments-maybe> ::= <argument> | <argument> <arguments-maybe> | ""
+<argument> ::= <hiccup> | <literal>
+```
 
 ##### Predicate
 

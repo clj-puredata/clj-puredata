@@ -1,6 +1,8 @@
 # List of supported Nodes
 
-These are defined in [translate.clj](../src/clj_puredata/translate.clj#L13).
+These are defined in [translate.clj](../src/clj_puredata/translate.clj#L13) and following.
+Notably currently _unsupported_ is `pd` (for creating a subpatch).
+Also note that `inlet` and `outlet` nodes are different from the synonymous functions; e.g. `[:inlet]` is a node while `(inlet ...)` modifies the intended connection between two nodes.
 
 ## General
 
