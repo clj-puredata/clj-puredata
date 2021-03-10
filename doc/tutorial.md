@@ -15,7 +15,9 @@ Basic Usage - Hiccup, Writing
              [:* [:msg 3]]) ; Nesting nodes creates connections between them.
 ```
 
-### Arguments
+![basics](img/basics.png)
+
+### Node Arguments
 
 ```clojure
 (write-patch "arguments.pd" 
@@ -23,6 +25,15 @@ Basic Usage - Hiccup, Writing
               [:msg 1]      ; Connected to first inlet.
               nil           ; `nil` skips an inlet.
               [:msg 3]])    ; Connected to third inlet.
+```
+
+### Node Options
+
+You can find supported node options in the [List of supported Options](options.md#node-options).
+
+```clojure
+(write-patch "node-options.pd"
+             [:tgl {:init 1 :init-value 0 :nonzero-value 100}]) ; options are passed as maps, and always come in second place 
 ```
 
 ### Inlet and Outlet
@@ -47,7 +58,12 @@ Basic Usage - Hiccup, Writing
              [:moses {:name 'm} 1])
 ```
 
-Advanced Usage - Live Reloading
 Patch Options list
 Supported Nodes
 Node Options list
+Live Reloading
+Advanced Usage
+Recursion
+
+
+
