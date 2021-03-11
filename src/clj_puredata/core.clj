@@ -14,7 +14,10 @@
   connect]
  [clj-puredata.translate
   write-patch
-  write-patch-reload]
+  write-patch-reload
+  color-file
+  color-runtime
+  hsl2rgb]
  [clj-puredata.puredata
   open-pd
   load-patches
