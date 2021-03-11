@@ -10,4 +10,13 @@
   :main clj-puredata.comms
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}}
-  :plugins [[lein-codox "0.10.3"]])
+  :plugins [[lein-codox "0.10.3"]
+            [lein-pprint "1.3.2"]]
+  :release-tasks [["vcs" "assert-committed"]
+                  ["change" "version" "leiningen.release/bump-version" "release"]
+                  ["vcs" "commit"]
+                  ["vcs" "tag" "--no-sign"]
+                  ["deploy"]
+                  ["change" "version" "leiningen.release/bump-version"]
+                  ["vcs" "commit"]
+                  ["vcs" "push"]])
