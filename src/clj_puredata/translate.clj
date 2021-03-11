@@ -335,14 +335,14 @@
    (assert (string? name))
    (let [[options_ forms] (if (and (map? options) (not (node? options)))
                             [options rest]
-                            [{} (cons options rest)])]
+                            [{} (or (cons options rest) [])])]
      (->> forms
           (apply pd)
           lines
           (patch name options_)
           (write name))))
   ([name]
-   (write-patch name {})))
+   (write-patch name {} [])))
 
 (defn write-patch-reload
   "Utility function that automatically reloads all patches on evaluation.
