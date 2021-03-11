@@ -29,15 +29,24 @@ Basic Usage - Hiccup, Writing
 
 ![arguments](img/arguments.png)
 
-### Node Options
+### Options
 
-You can find supported node options in the [List of supported Options](options.md#node-options).
-These are mostly relevant for UI nodes like Sliders, Toggles, Bangs etc.
+Options can be passed as the second argument to both Nodes (through hiccup) and Patches (through `write-patch` etc.).
+You can find a list of supported options in the [List of supported Options](options.md).
+These are relevant for UI nodes like Sliders, Toggles, Bangs etc., and also contain the graphing options for subpatches.
 
 ```clojure
-(write-patch "node-options.pd"
-             [:tgl {:init 1 :init-value 0 :nonzero-value 100}]) ; options are passed as maps, and *must* be the second element in the hiccup vector.
+(write-patch "options.pd"
+             {:width 200 :height 80} ; Set patch options as the second argument to `write-patch`.
+             [:bng {:name 'b         ; Set node options as the second element in hiccup vectors.
+                    :x 100 :y 5
+                    :size 64
+                    :label-text "red!"
+                    :fg-color -258049}
+              [:metro 500 [:loadbang]]])
 ```
+
+![options](img/options.png)
 
 ### Inlets and Outlets
 
