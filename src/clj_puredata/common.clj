@@ -32,6 +32,8 @@
 (defn other?
   "Check if a node is a placeholder or duplicate (it has no `:id`, but references an `:other`).
   Also see [[other]]."
-  [node]
-  (and (nil? (:id node))
-       (some? (:other node))))
+  [arg]
+  (and (map? arg)
+       (= (:type arg) :other)
+       ;;(nil? (:id node))
+       (some? (:other arg))))

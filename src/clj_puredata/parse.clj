@@ -202,7 +202,8 @@
   (cond
     (hiccup? form)
     (let [[options args] (if (and (map? (second form))
-                                  (not (node? (second form))))
+                                  (not (node? (second form)))
+                                  (not (other? (second form))))
                            [(second form) (drop 2 form)]
                            [{} (rest form)])
           op (op-from-kw (first form))
@@ -212,6 +213,9 @@
       node)
     (literal? form) form
     (node? form) form
+    ;;(connection? form) form
+    (user-connection? form) form
+    (other? form) form
     (map? form) (throw (Exception. (str "Parser encountered map that is a) not a node and b) not an options map (e.g. not the second element in a hiccup vector): " form)))
     (fn? form) (form)
     (or (list? form)
@@ -232,10 +236,11 @@
   (assert (number? n))
   (assert (or (hiccup? node)
               (seq? node)
-              (node? node)))
+              (node? node)
+              (other? node)))
   (assoc (cond (hiccup? node) (first (pd node))
                (seq? node) (first node)
-               (node? node) node)
+               :else node)
          which n))
 
 (defn outlet
@@ -247,9 +252,10 @@
   The default outlet is 0."
   [node n]
   (assert (or (node? node)
+              (other? node)
               (hiccup? node)))
   (assert (number? n))
-  (assoc-node-or-hiccup (if (node? node) node (pd node)) :outlet n))
+  (assoc-node-or-hiccup (if (hiccup? node) (pd node) node) :outlet n))
 
 (defn inlet
   "Use INLET to specify the intended inlet for a connection.
@@ -258,9 +264,10 @@
   NIL and other nodes) (e.g. 0 in the previous example)."
   [node n]
   (assert (or (node? node)
+              (other? node)
               (hiccup? node)))
   (assert (number? n))
-  (assoc-node-or-hiccup (if (node? node) node (pd node)) :inlet n))
+  (assoc-node-or-hiccup (if (hiccup? node) (pd node) node) :inlet n))
 
 (defn other
   "An OTHER is a special node that refers to another node.
@@ -289,5 +296,5 @@
   (pd [:+ {:name '+} 1 (other 'f)])
   ```"
   [reference]
-  {:type :node
+  {:type :other
    :other reference})
