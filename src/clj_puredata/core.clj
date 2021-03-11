@@ -2,7 +2,7 @@
   "Collects all user-facing functions of the other namespaces, for easy import."
   (:require [clj-puredata.parse :as parse]
             [clj-puredata.translate :as translate]
-            [clj-puredata.comms :as comms]
+            [clj-puredata.puredata :as puredata]
             [potemkin :refer [import-vars]]))
 
 (import-vars
@@ -10,23 +10,26 @@
   pd
   inlet
   outlet
-  other]
+  other
+  connect]
  [clj-puredata.translate
-  with-patch]
- [clj-puredata.comms
+  write-patch
+  write-patch-reload
+  color-file
+  color-runtime
+  hsl2rgb]
+ [clj-puredata.puredata
   open-pd
-  load-patch])
+  load-patches
+  reload-all-patches
+  startup])
 
-(comment
-  ;; 1 - create a basic patch using WITH-PATCH.
-  (with-patch "test.pd"
-    {:width 800 :height 800}
-    (pd [:text "Hello World"]))
-  ;; 2 - open PureData.
+(defn basic-usage []
   (open-pd)
   (Thread/sleep 3000)
-  ;; 3 - load your patch.
-  (load-patch "test.pd")
+  ;;(load-patch "test.pd")
+  (write-patch-reload "test.pd"
+    [:text "Hello World"])
   ;; 4 - now edit the original WITH-PATCH, evaluate it, and see PureData update accordingly.
   ;; 5 - rinse and repeat.
-  ) 
+  )

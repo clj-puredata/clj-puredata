@@ -6,8 +6,9 @@
   types to make sure all necessary keywords are present for filling
   the templates."
   (:require [clojure.string :as string]
-            [clj-puredata.parse :refer [in-context]]
-            [clj-puredata.comms :refer [reload]]))
+            [clj-puredata.parse :refer [lines pd]]
+            [clj-puredata.puredata :refer [reload-all-patches]]
+            [clj-puredata.common :refer :all]))
 
 (def obj-nodes
   "Set of default node types ('obj') available in PureData 0.47 (Vanilla)."
@@ -50,6 +51,12 @@
 (def slider-nodes
   #{"hsl" "vsl"})
 
+(def cnv-node
+  #{"cnv"})
+
+(def radio-nodes
+  #{"vradio" "hradio"})
+
 (def common-node-defaults
   "Super ultra lowest common denominator."
   {:x 0 :y 0})
@@ -80,6 +87,16 @@
           :label-color -1
           :size 15}))
 
+(def cnv-node-default
+  (merge ui-node-defaults
+         {:width 100
+          :height 60
+          :label-x 20
+          :label-y 12
+          :font-size 14
+          :bg-color -233017
+          :fg-color -66577}))
+
 (def slider-node-defaults
   (merge ui-node-defaults
          {:width 15
@@ -91,15 +108,23 @@
           :default 0 ; default means: saved slider position, in pixels.
           :steady-on-click 1}))
 
+(def radio-node-defaults
+  (merge ui-node-defaults
+         {:init 0
+          :init-value 0
+          :cells 8}))
+
 (def node-defaults
   "Default :options for node maps, used to fill node templates"
   {obj-nodes common-node-defaults
    self-nodes common-node-defaults
    floatatom-node (merge atom-node-defaults {:width 5})
    symbolatom-node (merge atom-node-defaults {:width 10})
+   cnv-node cnv-node-default
    bng-node (merge ui-node-defaults {:hold 250 :interrupt 50 :init 0})
-   tgl-node (merge ui-node-defaults {:init 0 :init-value 0  :nonzero-value 1})
-   slider-nodes slider-node-defaults})
+   tgl-node (merge ui-node-defaults {:init 0 :init-value 0 :nonzero-value 1})
+   slider-nodes slider-node-defaults
+   radio-nodes radio-node-defaults})
 
 (def node-templates
   "Correlate sets of nodes with common templates."
@@ -108,7 +133,9 @@
    atom-nodes ["#X" :op :x :y :width :lower-limit :upper-limit :label-pos :label-text :receive-symbol :send-symbol]
    bng-node ["#X obj" :x :y :op :size :hold :interrupt :init :send-symbol :receive-symbol :label-text :label-x :label-y :font-family :font-size :bg-color :fg-color :label-color]
    tgl-node ["#X obj" :x :y :op :size :init :send-symbol :receive-symbol :label-text :label-x :label-y :font-family :font-size :bg-color :fg-color :label-color :init-value :nonzero-value]
-   slider-nodes ["#X obj" :x :y :op :width :height :bottom :top :log :init :send-symbol :receive-symbol :label-text :label-x :label-y :font-family :font-size :bg-color :fg-color :label-color :default :steady-on-click]})
+   slider-nodes ["#X obj" :x :y :op :width :height :bottom :top :log :init :send-symbol :receive-symbol :label-text :label-x :label-y :font-family :font-size :bg-color :fg-color :label-color :default :steady-on-click]
+   cnv-node ["#X obj" :x :y :op :size :width :height :send-symbol :receive-symbol :label-text :label-x :label-y :font-family :font-size :bg-color :fg-color :label-color]
+   radio-nodes ["#X obj" :x :y :op :size "1" :init :cells :send-symbol :receive-symbol :label-text :label-x :label-y :font-family :font-size :bg-color :fg-color :label-color :init-value]})
 
 (def connection-template ["#X" "connect"
                           [:from-node :id]
@@ -295,19 +322,88 @@
           lines)
     lines))
 
-(defn write-patch
-  [file lines]
-  (spit file (string/join "\n" lines)))
+(defn patch
+  "Turns LINES into translated and layouted patch, e.g. the actual strings of the resulting PureData file."
+  [name options lines]
+  (assert (and (string? name)
+               (map? options)
+               (every? #(or (node? %) (connection? %)) lines)))
+  (let [options_ (merge patch-defaults options)]
+    (->> lines
+         (wrap-lines options_)
+         (move-layout options_)
+         (map translate-line))))
 
-(defmacro with-patch
+(defn write
+  [name patch]
+  (let [output (string/join "\n" patch)]
+    (spit name output)
+    output))
+
+(defn flatten-seq [x] (cond-> x (seq? x) flatten))
+
+(defn write-patch
+  "Assumes hiccup input for REST."
+  ([name options & rest]
+   (assert (string? name))
+   (let [[options_ forms] (if (and (map? options) (not (node? options)))
+                            [options rest]
+                            [{} (or (cons options rest) [])])]
+     (->> forms
+          (apply pd)
+          flatten-seq
+          lines
+          (patch name options_)
+          (write name))))
+  ([name]
+   (write-patch name {} [])))
+
+(defn write-patch-reload
+  "Utility function that automatically reloads patches on evaluation.
+  Patches have to be registered through LOAD-PATCHES or STARTUP beforehand."
   [name options & rest]
-  (let [[patch forms] (if (map? options)
-                        [(merge patch-defaults options) rest]
-                        [patch-defaults (cons options rest)])]
-    `(let [lines# (->> (in-context ~@forms)
-                       :lines
-                       (wrap-lines ~patch)
-                       (move-layout ~patch))
-           out# (map translate-line lines#)]
-       (write-patch ~name out#)
-       (reload))))
+  (apply write-patch name options rest)
+  (reload-all-patches))
+
+(defn color-runtime
+  [r g b]
+  (int (dec (+ (* r -65536)
+               (* g -256)
+               (* b -1)))))
+
+(defn color-file
+  ([r g b]
+   (let [[r_ g_ b_] (map #(-> % (/ 4) Math/floor) [r g b])]
+     (int (dec (+ (* r_ -4096)
+                  (* g_ -64)
+                  (* b_ -1))))))
+  ([[r g b]]
+   (color-file r g b)))
+
+(defn- hue2rgb
+  "Support function for `hsl2rgb`."
+  [p q t]
+  (let [t (cond (< t 0) (inc t)
+                (> t 1) (dec t)
+                :else t)]
+    (cond (< t 1/6) (+ p (* (- q p) 6 t))
+          (< t 1/2) q
+          (< t 2/3) (+ p (* (- q p) 6 (- 2/3 t)))
+          :else p)))
+
+(defn hsl2rgb
+  "Create [r g b] (red, green, blue) Vector from Hue, Saturation, Light parameters.
+  Assumes all parameters are in [0 .. 1] range.
+  Return rgb in [0 .. 255] range.
+  Credit: https://stackoverflow.com/a/9493060"
+  [h s l]
+  (->> (if (= s 0)
+         [l l l]
+         (let [q (if (< l 0.5)
+                   (* l (inc s))
+                   (+ l (- s (* l s))))
+               p (- (* 2 l) q)]
+           [(hue2rgb p q (+ h 1/3))
+            (hue2rgb p q h)
+            (hue2rgb p q (- h 1/3))]))
+       (map #(min (int (* 256 %)) 255))))

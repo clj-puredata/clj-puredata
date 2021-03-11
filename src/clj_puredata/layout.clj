@@ -1,4 +1,5 @@
 (ns clj-puredata.layout
+  "Rudimentary graph layouter for arranging nodes, to simplify debugging of generated patches. "
   (:require [clojure.set]
             [clj-puredata.common :refer :all]))
 
@@ -55,7 +56,7 @@
 (defn column-indentations
   []
   (let [cols (group-by :col (vals @node-map))
-        node-name-len #(count (clojure.string/join " " (cons (:op %) (:args %))))
+        node-name-len #(max 5 (inc (count (clojure.string/join " " (cons (:op %) (:args %))))))
         col-lens (for [n (range (count cols)) :let [col (cols n)]] ;; assure correct order
                    (apply max (map node-name-len col)))
         col-indents (reduce (fn [a b] (conj a (+ (last a) b)))
@@ -99,9 +100,9 @@
   [lines]
   (let [nodes (filter node? lines)
         connections (filter connection? lines)
-        ids (set (range (count nodes)))
+        ids (set (range (count nodes))) ;; assumes that node ids are dispensed sequentially, starting at 0
         child-nodes (set (map #(get-in % [:to-node :id]) connections))
-        top-nodes (sort (clojure.set/difference ids child-nodes))]
+        top-nodes (sort (clojure.set/difference ids child-nodes))] ;; FIXME: fails to find top node on completely circular patches (pd 3/7/2021)
     (reset! visited-nodes [])
     (reset! min-col 0)
     (reset! node-map (into {} (map #(vector (:id %) %) nodes)))
