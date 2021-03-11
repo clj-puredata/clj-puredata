@@ -35,7 +35,7 @@ You can find supported node options in the [List of supported Options](options.m
 
 ```clojure
 (write-patch "node-options.pd"
-             [:tgl {:init 1 :init-value 0 :nonzero-value 100}]) ; options are passed as maps, and always come in second place 
+             [:tgl {:init 1 :init-value 0 :nonzero-value 100}]) ; options are passed as maps, and *must* be the secondelement in the hiccup vector.
 ```
 
 ### Inlet and Outlet
@@ -63,6 +63,22 @@ You can find supported node options in the [List of supported Options](options.m
 ```
 
 ![other](img/other.png)
+
+### Connect
+
+```clojure
+(write-patch "connect.pd"
+             (connect [:loadbang] [:print "hello world!"])    ; Use `connect` to connect nodes explicitly.
+             (connect [:moses] 1 [:pack] 1)                   ; Use 4 arguments to specify inlet and outlet ...
+             (connect (outlet (inlet [:select] 1) 1) [:pack]) ; ... or use `inlet` and `outlet`.
+                                                              ; Note: they are used on the originating node.
+             [:msg {:name 'tik} "bang"]
+             [:metro {:name 'tok} 200]
+             (connect (other 'tik) (other 'tok)))             ; It works fine with `other` as well.
+```
+
+![connect](img/connect.png)
+
 
 Patch Options list
 Supported Nodes

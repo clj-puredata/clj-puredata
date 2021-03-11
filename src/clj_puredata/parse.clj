@@ -307,9 +307,11 @@
 (defn connect
   ([from-node outlet_ to-node inlet_]
    {:type :user-connection
-    :from (outlet from-node outlet_)
-    :to (inlet to-node inlet_)})
+    :from (-> from-node
+              (outlet outlet_)
+              (inlet inlet_))
+    :to (pd to-node)})
   ([from-node to-node]
-   (connect from-node (:outlet from-node 0) to-node (:inlet to-node 0))))
+   (connect from-node (:outlet from-node 0) to-node (:inlet from-node 0))))
 ;; (connect-to to-node from-node1 from-node2 from-node3 ...)
 ;; (connect-from from-node to-node1 to-node2 to-node3

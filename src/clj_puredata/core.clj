@@ -10,7 +10,8 @@
   pd
   inlet
   outlet
-  other]
+  other
+  connect]
  [clj-puredata.translate
   write-patch
   write-patch-reload]
