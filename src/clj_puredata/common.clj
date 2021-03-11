@@ -29,6 +29,11 @@
   (and (map? arg)
        (= (:type arg) :connection)))
 
+(defn user-connection?
+  [arg]
+  (and (map? arg)
+       (= (:type arg) :user-connection)))
+
 (defn other?
   "Check if a node is a placeholder or duplicate (it has no `:id`, but references an `:other`).
   Also see [[other]]."

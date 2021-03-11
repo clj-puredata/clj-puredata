@@ -92,10 +92,11 @@
                              (vec (for [l lines]
                                     (cond
                                       (node? l) l
-                                      (connection? l) (let [from (get-in l [:from-node :id])]
-                                                        (if (other? from)
-                                                          (assoc-in l [:from-node :id] (:id (resolve-other from)))
-                                                          l))
+                                      (connection? l) (let [from (get-in l [:from-node :id])
+                                                            to (get-in l [:to-node :id])]
+                                                        (cond-> l
+                                                          (other? from) (assoc-in [:from-node :id] (:id (resolve-other from)))
+                                                          (other? to) (assoc-in [:to-node :id] (:id (resolve-other to)))))
                                       :else l))))))
 
 #_(defn- assoc-layout
@@ -172,6 +173,9 @@
    (cond
      (other? node) node
      (processed? node) (get-processed-id node)
+     (user-connection? node) (add-element! (connection (walk-node! (:from node))
+                                                       (walk-node! (:to node))
+                                                       0))
      :else (let [id-node (dispense-node-id node)]
              (record-as-processed id-node)
              (add-element! (remove-node-args id-node))
@@ -183,8 +187,9 @@
   Assumes NODES is a list."
   [nodes]
   (assert (or (node? nodes)
+              (user-connection? nodes)
               (and (seq? nodes)
-                   (every? node? nodes))))
+                   (every? #(or (node? %) (user-connection? %)) nodes))))
   (do
     (setup-parse-context)
     (doall (map walk-node! (if (seq? nodes) nodes (vector nodes))))
@@ -298,3 +303,13 @@
   [reference]
   {:type :other
    :other reference})
+
+(defn connect
+  ([from-node outlet_ to-node inlet_]
+   {:type :user-connection
+    :from (outlet from-node outlet_)
+    :to (inlet to-node inlet_)})
+  ([from-node to-node]
+   (connect from-node (:outlet from-node 0) to-node (:inlet to-node 0))))
+;; (connect-to to-node from-node1 from-node2 from-node3 ...)
+;; (connect-from from-node to-node1 to-node2 to-node3
