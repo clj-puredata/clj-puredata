@@ -95,13 +95,13 @@ These are relevant for UI nodes like Sliders, Toggles, Bangs etc., and also cont
 (let [hues 32
       size 18
       width (+ 32 (* hues size))]
-  (write-patch-reload
+  (write-patch
    "colors.pd"
    {:width width
     :view-width width
     :view-height 32 :graph-on-parent 1}
    [:msg "; all-bangs color $1 0 0"
-    (inlet [:msg (color-runtime 255 0 0) [:msg "red"]] 0)       ; Use `color-runtime` for changing colors live.
+    (inlet [:msg (color-runtime 255 0 0) [:msg "red"]] 0)       ; Use `color-runtime` for sending color values during runtime.
     (inlet [:msg (color-runtime 0 255 0) [:msg "green"]] 0)
     (inlet [:msg (color-runtime 0 0 255) [:msg "blue"]] 0)]
    (map #(vector :bng {:x (+ 16 (* % size)) :y 5
