@@ -356,7 +356,7 @@
    (write-patch name {} [])))
 
 (defn write-patch-reload
-  "Utility function that automatically reloads all patches on evaluation.
+  "Utility function that automatically reloads patches on evaluation.
   Patches have to be registered through LOAD-PATCHES or STARTUP beforehand."
   [name options & rest]
   (apply write-patch name options rest)
