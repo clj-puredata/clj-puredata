@@ -32,13 +32,14 @@ Basic Usage - Hiccup, Writing
 ### Node Options
 
 You can find supported node options in the [List of supported Options](options.md#node-options).
+These are mostly relevant for UI nodes like Sliders, Toggles, Bangs etc.
 
 ```clojure
 (write-patch "node-options.pd"
-             [:tgl {:init 1 :init-value 0 :nonzero-value 100}]) ; options are passed as maps, and *must* be the secondelement in the hiccup vector.
+             [:tgl {:init 1 :init-value 0 :nonzero-value 100}]) ; options are passed as maps, and *must* be the second element in the hiccup vector.
 ```
 
-### Inlet and Outlet
+### Inlets and Outlets
 
 ```clojure
 (write-patch "inlet-and-outlet.pd"
@@ -51,7 +52,7 @@ You can find supported node options in the [List of supported Options](options.m
 
 ![inlet and outlet](img/inlet-and-outlet.png)
 
-### Other
+### Referencing Nodes
 
 ```clojure
 (write-patch "other.pd"
@@ -64,7 +65,7 @@ You can find supported node options in the [List of supported Options](options.m
 
 ![other](img/other.png)
 
-### Connect
+### Connecting Nodes
 
 ```clojure
 (write-patch "connect.pd"
