@@ -340,6 +340,8 @@
     (spit name output)
     output))
 
+(defn flatten-seq [x] (cond-> x (seq? x) flatten))
+
 (defn write-patch
   "Assumes hiccup input for REST."
   ([name options & rest]
@@ -349,7 +351,7 @@
                             [{} (or (cons options rest) [])])]
      (->> forms
           (apply pd)
-          flatten
+          flatten-seq
           lines
           (patch name options_)
           (write name))))
