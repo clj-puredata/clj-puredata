@@ -39,7 +39,7 @@
   An argument of NIL is interpreted as explicitly 'skipping' an inlet.
   Any other arguments (literals/numbers/strings) are ignored in this count."
   [x]
-  (or (node? x) (nil? x)))
+  (or (node? x) (other? x) (nil? x)))
 
 (defn setup-parse-context []
   (swap! parse-context conj {:current-node-id 0
@@ -149,22 +149,21 @@
   (update node :args (comp vec (partial remove node-or-explicit-skip?))))
 
 (defn- connection
-  [from-node to-id inlet]
+  [from-node to-node inlet]
   {:type :connection
-   :from-node {:id (if (other? from-node)
-                     from-node
-                     (:id from-node))
+   :from-node {:id (cond-> from-node (not (other? from-node)) :id) ;;(if (other? from-node) from-node (:id from-node))
                :outlet (:outlet from-node 0)} ; if :outlet is defined, use it, else use 0
-   :to-node {:id to-id
+   :to-node {:id (cond-> to-node (not (other? to-node)) :id)
              :inlet (:inlet from-node inlet)}}) ; if :inlet is defined, use it, else use INLET parameter (defaults to argument position)
 
 (declare walk-node!)
 (defn- walk-node-args!
   [node]
-  (let [connected-nodes (filter node-or-explicit-skip? (:args node))]
-    (when (not (empty? connected-nodes))
-      (doall (map-indexed (fn [i c] (when (node? c) (add-element! (connection (walk-node! c) (:id node) i))))
-                          connected-nodes)))))
+  (let [node-or-nil-list (filter node-or-explicit-skip? (:args node))]
+    (when (not (empty? node-or-nil-list))
+      (doall (map-indexed (fn [arg-pos arg] (when (or (node? arg) (other? arg))
+                                              (add-element! (connection (walk-node! arg) node arg-pos))))
+                          node-or-nil-list)))))
 
 (defn- walk-node!
   "The main, recursive function responsible for adding nodes and connections to the PARSE-CONTEXT.
