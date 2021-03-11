@@ -189,7 +189,9 @@
   (assert (or (node? nodes)
               (user-connection? nodes)
               (and (seq? nodes)
-                   (every? #(or (node? %) (user-connection? %)) nodes))))
+                   (every? #(or (node? %)
+                                (user-connection? %))
+                           nodes))))
   (do
     (setup-parse-context)
     (doall (map walk-node! (if (seq? nodes) nodes (vector nodes))))
