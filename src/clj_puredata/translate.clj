@@ -349,6 +349,7 @@
                             [{} (or (cons options rest) [])])]
      (->> forms
           (apply pd)
+          flatten
           lines
           (patch name options_)
           (write name))))
