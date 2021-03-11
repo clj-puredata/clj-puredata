@@ -51,8 +51,10 @@ Check the [Documentation](doc/intro.md), especially the [Tutorial](doc/tutorial.
 - [ ] helpers for coloring ui-nodes (copy from cl-pd)
 - [ ] `connect` function & supporting data structure for adding connections after node creation
 - [ ] layouter should sort node arguments by inlet number (instead of argument position)
-- [ ] DEBUG: do `inlet` and `outlet` work on `other`???
+- [x] DEBUG: do `inlet` and `outlet` work on `other`???
 - [ ] add support for `:left`, `:right`, `:first`, `:second`, etc. as arguments to `inlet` or `outlet`
+- [x] add support for radio ui nodes
+  - [ ] find out what the constant "1" in the `radio-nodes` template is used for
 
 
 ## License

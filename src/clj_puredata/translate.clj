@@ -54,6 +54,9 @@
 (def cnv-node
   #{"cnv"})
 
+(def radio-nodes
+  #{"vradio" "hradio"})
+
 (def common-node-defaults
   "Super ultra lowest common denominator."
   {:x 0 :y 0})
@@ -105,6 +108,12 @@
           :default 0 ; default means: saved slider position, in pixels.
           :steady-on-click 1}))
 
+(def radio-node-defaults
+  (merge ui-node-defaults
+         {:init 0
+          :init-value 0
+          :cells 8}))
+
 (def node-defaults
   "Default :options for node maps, used to fill node templates"
   {obj-nodes common-node-defaults
@@ -113,8 +122,9 @@
    symbolatom-node (merge atom-node-defaults {:width 10})
    cnv-node cnv-node-default
    bng-node (merge ui-node-defaults {:hold 250 :interrupt 50 :init 0})
-   tgl-node (merge ui-node-defaults {:init 0 :init-value 0  :nonzero-value 1})
-   slider-nodes slider-node-defaults})
+   tgl-node (merge ui-node-defaults {:init 0 :init-value 0 :nonzero-value 1})
+   slider-nodes slider-node-defaults
+   radio-nodes radio-node-defaults})
 
 (def node-templates
   "Correlate sets of nodes with common templates."
@@ -124,7 +134,8 @@
    bng-node ["#X obj" :x :y :op :size :hold :interrupt :init :send-symbol :receive-symbol :label-text :label-x :label-y :font-family :font-size :bg-color :fg-color :label-color]
    tgl-node ["#X obj" :x :y :op :size :init :send-symbol :receive-symbol :label-text :label-x :label-y :font-family :font-size :bg-color :fg-color :label-color :init-value :nonzero-value]
    slider-nodes ["#X obj" :x :y :op :width :height :bottom :top :log :init :send-symbol :receive-symbol :label-text :label-x :label-y :font-family :font-size :bg-color :fg-color :label-color :default :steady-on-click]
-   cnv-node ["#X obj" :x :y :op :size :width :height :send-symbol :receive-symbol :label-text :label-x :label-y :font-family :font-size :bg-color :fg-color :label-color]})
+   cnv-node ["#X obj" :x :y :op :size :width :height :send-symbol :receive-symbol :label-text :label-x :label-y :font-family :font-size :bg-color :fg-color :label-color]
+   radio-nodes ["#X obj" :x :y :op :size "1" :init :cells :send-symbol :receive-symbol :label-text :label-x :label-y :font-family :font-size :bg-color :fg-color :label-color :init-value]})
 
 (def connection-template ["#X" "connect"
                           [:from-node :id]
