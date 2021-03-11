@@ -89,6 +89,30 @@ These are relevant for UI nodes like Sliders, Toggles, Bangs etc., and also cont
 
 ![connect](img/connect.png)
 
+### Colors
+
+```clojure
+(let [hues 32
+      size 18
+      width (+ 32 (* hues size))]
+  (write-patch-reload
+   "colors.pd"
+   {:width width
+    :view-width width
+    :view-height 32 :graph-on-parent 1}
+   [:msg "; all-bangs color $1 0 0"
+    (inlet [:msg (color-runtime 255 0 0) [:msg "red"]] 0)       ; Use `color-runtime` for changing colors live.
+    (inlet [:msg (color-runtime 0 255 0) [:msg "green"]] 0)
+    (inlet [:msg (color-runtime 0 0 255) [:msg "blue"]] 0)]
+   (map #(vector :bng {:x (+ 16 (* % size)) :y 5
+                       :receive-symbol "all-bangs"
+                       :bg-color (color-file                    ; Use `color-file` for color values stored in the file.
+                                  (hsl2rgb (/ % hues) 1 0.5))}) ; Helper function `hsl2rgb` is available.
+        (range hues))))
+```
+
+![colors](img/colors.png)
+
 
 Patch Options list
 Supported Nodes
