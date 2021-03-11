@@ -378,6 +378,7 @@
    (color-file r g b)))
 
 (defn- hue2rgb
+  "Support function for `hsl2rgb`."
   [p q t]
   (let [t (cond (< t 0) (inc t)
                 (> t 1) (dec t)
@@ -390,7 +391,8 @@
 (defn hsl2rgb
   "Create [r g b] (red, green, blue) Vector from Hue, Saturation, Light parameters.
   Assumes all parameters are in [0 .. 1] range.
-  Return rgb in [0 .. 255] range."
+  Return rgb in [0 .. 255] range.
+  Credit: https://stackoverflow.com/a/9493060"
   [h s l]
   (->> (if (= s 0)
          [l l l]
