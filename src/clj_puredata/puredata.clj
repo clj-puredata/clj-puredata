@@ -61,7 +61,7 @@
   (open-pd)
   (when-not (empty? filenames)
     (Thread/sleep 3000)
-    (apply load-patches filenames)))
+    (apply reset! reload-targets filenames)))
 
 (defn -main
   [& args]
