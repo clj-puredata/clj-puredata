@@ -12,24 +12,29 @@
 
 (defonce reload-targets (atom #{}))
 
+(defonce dir-helpers "patches/helpers")
+
+(defonce dir-target "patches")
+
 (defn- copy-patches-from-uberjar
   []
+  (.mkdirs (io/file dir-helpers))
   (doseq [patch ["reload-patch.pd"
                  "osc-to-pd.pd"
                  "oscparse-numbers.pd"
                  "for-each.pd"
                  "symbol-to-float.pd"]
           :let [in (io/input-stream (io/resource patch))
-                out (io/file patch)]]
+                out (io/file (str dir-helpers \/ patch))]]
     (io/copy in out)))
 
 (defn open-pd
   "Attempts to run PureData and open OSC channel for communication."
   []
-  (when-not (.exists (io/file "reload-patch.pd"))
+  (when-not (.exists (io/file (str dir-helpers \/ "reload-patch.pd")))
     (copy-patches-from-uberjar))
   (reset! pd-osc-client (osc-client "localhost" 5000))
-  (reset! pd-process (future (sh "pd" "reload-patch.pd"))))
+  (reset! pd-process (future (sh "pd" "-path" dir-helpers "reload-patch.pd"))))
 
 (defn- send-to-pd
   [target & strings]
@@ -53,7 +58,7 @@
 (defn load-patches
   "Registers the patches to be reloaded when `write-patch-reload` or `reload-all-patches` is called."
   [& filenames]
-  (apply swap! reload-targets conj filenames)
+  (reset! reload-targets filenames)
   (reload-all-patches))
 
 (defn startup
@@ -61,7 +66,7 @@
   (open-pd)
   (when-not (empty? filenames)
     (Thread/sleep 3000)
-    (apply reset! reload-targets filenames)))
+    (apply load-patches filenames)))
 
 (defn -main
   [& args]

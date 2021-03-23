@@ -1,6 +1,4 @@
-#N canvas 975 158 629 556 10;
-#X declare -path resources/;
-#X obj 32 114 declare -path resources/;
+#N canvas 972 167 629 556 10;
 #X obj 31 140 osc-to-pd 5000;
 #X obj 31 165 r reload;
 #X msg 58 272 \; pd-hello-world.pd menuclose \; pd open hello-world.pd
@@ -14,8 +12,8 @@
 "path/to/patch/" to port 5000, f 92;
 #X text 38 55 note: leading slash "/" on first field \, second field
 ending in ".pd" \, trailing slash "/" on third field., f 40;
-#X connect 2 0 5 0;
-#X connect 4 0 3 0;
+#X connect 1 0 4 0;
+#X connect 3 0 2 0;
+#X connect 4 0 2 0;
+#X connect 4 1 5 0;
 #X connect 5 0 3 0;
-#X connect 5 1 6 0;
-#X connect 6 0 4 0;
