@@ -37,7 +37,7 @@ These options are supported as the second argument to `write-patch`, `write-patc
 
 ```clojure
 (write-patch "example.pd"
-  {:width 800 :height 600} ;; <-- put options here
+  {:width 800 :height 600} ; <-- put options here
   [:print [:msg "hello world"]])
 ```
 

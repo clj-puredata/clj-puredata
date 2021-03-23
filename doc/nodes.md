@@ -268,7 +268,7 @@ Also note that `inlet` and `outlet` nodes are different from the synonymous func
 `rev3~`
 `bob~`
 
-## Others
+## GUI and Others
 
 `msg`
 `text`
@@ -278,3 +278,5 @@ Also note that `inlet` and `outlet` nodes are different from the synonymous func
 `tgl`
 `hsl`
 `vsl`
+`vradio`
+`hradio`

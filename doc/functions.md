@@ -20,6 +20,7 @@ This explains the main functions in detail. For a tutorial covering their interp
 | [`load-patches`](#load-patches)             | one or more filenames                               |                        |                                                    |
 | [`reload-all-patches`](#reload-all-patches) |                                                     |                        |                                                    |
 | [`open-pd`](#open-pd)                       |                                                     |                        |                                                    |
+| [`import-image`](#import-image)             |                                                     |                        |                                                    |
 
 ##### Internal Functions
 
@@ -30,6 +31,11 @@ This explains the main functions in detail. For a tutorial covering their interp
 | [`write`](#write)                           | [patch](types.md#patch)                             | [file](types.md#file)   |
 
 ## PD
+
+```
+(pd hiccup-vector*)   -> hash-map
+(pd [hiccup-vector*]) -> [hash-map*]
+```
 
 `pd` converts hiccup syntax into Nodes. If `pd` encounters a Node during parsing, it will be passed along unchanged.
 `pd` is implicitly called by [`write-patch`](#write-patch) and [`write-patch-reload`](#write-patch-reload).
