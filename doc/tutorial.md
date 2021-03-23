@@ -1,10 +1,30 @@
 # Tutorial
 
-Basic Usage - Hiccup, Writing
+- [Creating Patches](#creating-patches)
+  - [Nodes](#nodes)
+  - [Node Arguments](#node-arguments)
+  - [Options](#options)
+  - [Inlets and Outlets](#inlets-and-outlets)
+  - [Referencing Nodes](#referencing-nodes)
+  - [Connecting Nodes](#connecting-nodes)
+- [Misc](#misc)
+  - [Colors](#colors)
+  - [Images](#images)
 
-## Basics
+Still Missing:
+- Patch Options list
+- Supported Nodes
+- Node Options list
+- Advanced Usage
+  - Live Reloading
+  - Recursion
+
+
+## Creating Patches
 
 ### Nodes
+
+A list of supported nodes can be found in [`Nodes.md`](nodes.md)
 
 ```clojure
 (write-patch "basics.pd"
@@ -89,6 +109,8 @@ These are relevant for UI nodes like Sliders, Toggles, Bangs etc., and also cont
 
 ![connect](img/connect.png)
 
+## Misc
+
 ### Colors
 
 ```clojure
@@ -113,13 +135,12 @@ These are relevant for UI nodes like Sliders, Toggles, Bangs etc., and also cont
 
 ![colors](img/colors.png)
 
+### Images
 
-Patch Options list
-Supported Nodes
-Node Options list
-Live Reloading
-Advanced Usage
-Recursion
+```clojure
+(write-patch "smilie.pd"
+  (import-image "smilie.png" 32)) ; Turns a PNG image into colored canvasses.
+```
 
-
+![import-image](img/import-image.png)
 
