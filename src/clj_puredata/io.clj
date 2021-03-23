@@ -35,7 +35,7 @@
   (when-not (.exists (io/file (str dir-helpers \/ "reload-patch.pd")))
     (copy-patches-from-uberjar))
   (reset! pd-osc-client (osc-client "localhost" 5000))
-  (reset! pd-process (future (sh "pd" "-path" dir-helpers "reload-patch.pd"))))
+  (reset! pd-process (future (sh "pd" "-path" dir-helpers "-path" dir-target "reload-patch.pd"))))
 
 (defn- send-to-pd
   [target & strings]
@@ -45,7 +45,7 @@
        (catch Exception e (str "Unable to send osc message to pd:" (.getMessage e)))))
 
 (defn reload-patch [patch-file-name]
-  (let [file (clojure.java.io/file patch-file-name)
+  (let [file (clojure.java.io/file (str dir-target \/ patch-file-name))
         file-name (.getName file)
         dir (.getPath (.getParentFile (.getAbsoluteFile file)))]
     (send-to-pd "/reload" file-name dir)))
@@ -71,8 +71,9 @@
 
 (defn write
   [name patch]
+  (.mkdirs (io/file dir-target))
   (let [output (string/join "\n" patch)]
-    (spit name output)
+    (spit (str dir-target \/ name) output)
     output))
 
 (defn -main
