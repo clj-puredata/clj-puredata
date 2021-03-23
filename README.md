@@ -17,7 +17,7 @@ Whenever you change and re-evaluage the `write-patch-reload` form, the patch wil
 ```clojure
 (ns example.core
   (:require [clj-puredata.core :refer :all]))
-    
+
 (write-patch "counter.pd"
              [:outlet [:float {:name 'the-float}
                        0
@@ -47,15 +47,21 @@ Check the [Documentation](doc/intro.md), especially the [Tutorial](doc/tutorial.
 - [x] finish patch footer template for "graph on parent" options.
 - [x] patches (e.g. ["patch.pd" ...] should be recognized).
 - [x] remove the need for explicit PD anywhere - make it implicit in WITH-PATCH, INLET, OUTLET, OTHER.
-- [ ] subpatches (needs multiple parsing contexts? e.g. map of context instead of single atom)
-- [ ] helpers for coloring ui-nodes (copy from cl-pd)
-- [x] `connect` function & supporting data structure for adding connections after node creation
-- [ ] layouter should sort node arguments by inlet number (instead of argument position)
 - [x] DEBUG: do `inlet` and `outlet` work on `other`???
-- [ ] add support for `:left`, `:right`, `:first`, `:second`, etc. as arguments to `inlet` or `outlet`
+- [x] `connect` function & supporting data structure for adding connections after node creation
 - [x] add support for radio ui nodes
   - [ ] find out what the constant "1" in the `radio-nodes` template is used for
+- [ ] subpatches (needs multiple parsing contexts? e.g. map of context instead of single atom)
+- [x] helpers for coloring ui-nodes (copy from cl-pd)
+- [ ] layouter should sort node arguments by inlet number (instead of argument position)
+- [ ] add support for `:left`, `:right`, `:first`, `:second`, etc. as arguments to `inlet` or `outlet`
+  (q: how? some nodes have variable # of inlets/outlets)
 - [ ] Redo Tutorial for Options, use UI node with Colors for demonstration
+- [ ] make `write-patch-reload` return file string as well.
+- [ ] put generated patches into a `patch` subdirectory instead of `./` root.
+- [ ] expand resources into separate directory (e.g. `helper-patches`) instead of `./` root.
+- [ ] add image-to-patch functionality.
+- [ ] make layout engine ignore any nodes that have :x or :y set (also ignore them when setting column widths or offsets).
 
 ## License
 
