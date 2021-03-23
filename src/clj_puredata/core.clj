@@ -2,7 +2,7 @@
   "Collects all user-facing functions of the other namespaces, for easy import."
   (:require [clj-puredata.parse :as parse]
             [clj-puredata.translate :as translate]
-            [clj-puredata.puredata :as puredata]
+            [clj-puredata.io :as io]
             [clj-puredata.misc :as misc]
             [potemkin :refer [import-vars]]))
 
@@ -16,7 +16,7 @@
  [clj-puredata.translate
   write-patch
   write-patch-reload]
- [clj-puredata.puredata
+ [clj-puredata.io
   open-pd
   load-patches
   reload-all-patches

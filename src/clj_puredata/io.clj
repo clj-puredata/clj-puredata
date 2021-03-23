@@ -1,8 +1,9 @@
-(ns clj-puredata.puredata
+(ns clj-puredata.io
   "PureData OSC communication and live reloading of patches."
   (:gen-class)
   (:require [overtone.osc :refer [osc-client
                                   osc-send]]
+            [clojure.string :as string]
             [clojure.java.shell :refer [sh]]
             [clojure.java.io :as io]))
 
@@ -67,6 +68,12 @@
   (when-not (empty? filenames)
     (Thread/sleep 3000)
     (apply load-patches filenames)))
+
+(defn write
+  [name patch]
+  (let [output (string/join "\n" patch)]
+    (spit name output)
+    output))
 
 (defn -main
   [& args]

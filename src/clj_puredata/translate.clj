@@ -7,7 +7,8 @@
   the templates."
   (:require [clojure.string :as string]
             [clj-puredata.parse :refer [lines pd]]
-            [clj-puredata.puredata :refer [reload-all-patches]]
+            [clj-puredata.io :refer [reload-all-patches
+                                     write]]
             [clj-puredata.common :refer :all]))
 
 (def obj-nodes
@@ -333,12 +334,6 @@
          (wrap-lines options_)
          (move-layout options_)
          (map translate-line))))
-
-(defn write
-  [name patch]
-  (let [output (string/join "\n" patch)]
-    (spit name output)
-    output))
 
 (defn flatten-seq [x] (cond-> x (seq? x) flatten))
 
