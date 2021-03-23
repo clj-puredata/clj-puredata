@@ -55,12 +55,12 @@ Check the [Documentation](doc/intro.md), especially the [Tutorial](doc/tutorial.
 - [x] helpers for coloring ui-nodes (copy from cl-pd)
 - [x] Redo Tutorial for Options, use UI node with Colors for demonstration
 - [x] expand resources into separate directory (e.g. `helper-patches`) instead of `./` root.
+- [x] put generated patches into a `patch` subdirectory instead of `./` root.
 - [x] add image-to-patch functionality.
 - [ ] subpatches (needs multiple parsing contexts? e.g. map of context instead of single atom)
 - [ ] layouter should sort node arguments by inlet number (instead of argument position)
 - [ ] add support for `:left`, `:right`, `:first`, `:second`, etc. as arguments to `inlet` or `outlet`
   (q: how? some nodes have variable # of inlets/outlets)
-- [ ] put generated patches into a `patch` subdirectory instead of `./` root.
 - [ ] make layout engine ignore any nodes that have :x or :y set (also ignore them when setting column widths or offsets).
 
 ## License
