@@ -110,6 +110,7 @@ Supported in: `tgl`
 
 | option             | default | comment                                        |
 |--------------------|---------|------------------------------------------------|
+| `:width`           | 15      |                                                |
 | `:height`          | 15      |                                                |
 | `:bottom`          | 0       | minimum value                                  |
 | `:top`             | 127     | maximum value                                  |
