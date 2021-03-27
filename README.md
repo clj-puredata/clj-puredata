@@ -62,6 +62,10 @@ Check the [Documentation](doc/intro.md), especially the [Tutorial](doc/tutorial.
 - [ ] add support for `:left`, `:right`, `:first`, `:second`, etc. as arguments to `inlet` or `outlet`
   (q: how? some nodes have variable # of inlets/outlets)
 - [ ] make layout engine ignore any nodes that have :x or :y set (also ignore them when setting column widths or offsets).
+- [ ] clarify gotchas like the use of dashes in signal-nodes like `[:+-]`
+- [ ] fix bug in layouter that calculates node size of messages wrong
+- [ ] fix bug in layouter where two nodes can occupy the same position
+- [ ] fix bug in layouter where a completely circular patch fails to compile
 
 ## License
 
