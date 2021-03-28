@@ -55,9 +55,13 @@
 
 (defn column-indentations
   []
-  (let [cols (group-by :col (vals @node-map))
-        node-name-len #(max 5 (inc (count (clojure.string/join " " (cons (:op %) (:args %))))))
-        col-lens (for [n (range (count cols)) :let [col (cols n)]] ;; assure correct order
+  (let [cols (group-by :col (vals @node-map)) ;; problem: this map contains key `nil` when some nodes have not been processed (e.g. circularly connected ones)
+        ;; this causes `(count cols)` to be 1 higher than the actual column count
+        ;; and `(cols (count cols))` will return `nil` (because the numeric key isn't found).
+        node-name-len #(max 5 (min 25 (inc (count (clojure.string/join " " (cons (:op %) (:args %)))))))
+        col-lens (for [n (range (count cols))
+                       :let [col (cols n)] ; assure correct order
+                       :when (some? col)]  ; prevent nil
                    (apply max (map node-name-len col)))
         col-indents (reduce (fn [a b] (conj a (+ (last a) b)))
                             [0] col-lens)]
