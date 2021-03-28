@@ -113,6 +113,8 @@
     (reset! connections-map (group-by #(get-in % [:from-node :id]) connections))
     ;;
     (doall (map run-chain top-nodes))
+    ;; TODO: check for non-traversed nodes (e.g. circularly connected) and traverse them in some way. (pd 3/29/2021)
+    ;; (e.g. pick at random, traverse, check again if any untraversed remain)
     (convert-rows!)
     ;;
     (into (sorted-nodes) connections)))

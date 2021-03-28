@@ -63,9 +63,9 @@ Check the [Documentation](doc/intro.md), especially the [Tutorial](doc/tutorial.
   (q: how? some nodes have variable # of inlets/outlets)
 - [ ] make layout engine ignore any nodes that have :x or :y set (also ignore them when setting column widths or offsets).
 - [ ] clarify gotchas like the use of dashes in signal-nodes like `[:+-]`
-- [ ] fix bug in layouter that calculates node size of messages wrong
+- [x] fix bug in layouter that calculates node size of messages wrong (workaround: limit at 25 characters node size)
 - [ ] fix bug in layouter where two nodes can occupy the same position
-- [ ] fix bug in layouter where a completely circular patch fails to compile
+- [ ] fix behavior in layouter where any completely circular part of a patch is pushed into the top-left corner and not layouted correctly.
 
 ## License
 
