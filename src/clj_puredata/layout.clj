@@ -69,8 +69,8 @@
 
 (defn manually-positioned?
   [n]
-  (and (get-in n [:options :x])
-       (get-in n [:options :y])))
+  (or (get-in n [:options :x])
+      (get-in n [:options :y])))
 
 (defn auto-position
   [n & {:keys [col-pos row-pos
