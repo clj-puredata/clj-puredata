@@ -79,8 +79,8 @@
              row-pos (fn [n] (* n 40))
              x-offset 5 y-offset 5}}]
   (-> n
-      (update-in [:options :y] (fn [y] (if (some? y) y (+ y-offset (row-pos (:row n))))))
-      (update-in [:options :x] (fn [x] (if (some? x) x (+ x-offset (col-pos (:col n))))))
+      (update-in [:options :y] (fn [y] (if (some? y) y (+ y-offset (row-pos (:row n 0))))))
+      (update-in [:options :x] (fn [x] (if (some? x) x (+ x-offset (col-pos (:col n 0))))))
       (assoc :auto-layout true)))
 
 (defn convert-rows!
