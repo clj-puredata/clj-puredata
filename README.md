@@ -66,6 +66,8 @@ Check the [Documentation](doc/intro.md), especially the [Tutorial](doc/tutorial.
 - [x] fix bug in layouter that calculates node size of messages wrong (workaround: limit at 25 characters node size)
 - [ ] fix bug in layouter where two nodes can occupy the same position
 - [ ] fix behavior in layouter where any completely circular part of a patch is pushed into the top-left corner and not layouted correctly.
+- [ ] add optional arguments `:inlet`, `:outlet` to `other` -- `(other 'ref :inlet 0 :outlet 1)`
+- [ ] add helper `in-out-lets` that can supply both `:inlet` and `:outlet` in one call?
 
 ## License
 
