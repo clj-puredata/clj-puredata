@@ -55,17 +55,24 @@
 
 (defn column-indentations
   []
-  (let [cols (group-by :col (vals @node-map)) ;; problem: this map contains key `nil` when some nodes have not been processed (e.g. circularly connected ones)
+  (let [cols (group-by :col (vals @node-map))
+        ;; FIXME: this map contains key `nil` when some nodes have not been processed (e.g. circularly connected ones)
         ;; this causes `(count cols)` to be 1 higher than the actual column count
         ;; and `(cols (count cols))` will return `nil` (because the numeric key isn't found).
+        ;; --> TODO: improve algo lol - comb tree and remove circles from graph
+        ;; FIXME: this map also might skip indices, and those will be dropped quietly, and this will result in the `col-lens` array being too short because some nodes will still index the high column and cause out-of-bounds when accessing the result of this function.
+        ;; --> FIXED: sorted-map instead of vector
         node-name-len #(max 5 (min 25 (inc (count (clojure.string/join " " (cons (:op %) (:args %)))))))
-        col-lens (for [n (range (count cols))
+        col-lens (for [n (sort (keys cols)) ;;(range (count cols))
                        :let [col (cols n)] ; assure correct order
                        :when (some? col)]  ; prevent nil
                    (apply max (map node-name-len col)))
         col-indents (reduce (fn [a b] (conj a (+ (last a) b)))
-                            [0] col-lens)]
-    (mapv #(* % 7) col-indents)))
+                            [0]
+                            col-lens)
+        col-indents-scaled (mapv #(* % 7) col-indents)]
+    (into (sorted-map) (zipmap (sort (filter some? (keys cols)))
+                               col-indents-scaled))))
 
 (defn manually-positioned?
   [n]
