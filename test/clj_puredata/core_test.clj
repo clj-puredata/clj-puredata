@@ -1,6 +1,7 @@
 (ns clj-puredata.core-test
   (:require [clojure.test :refer :all]
             [clj-puredata.core :refer :all]
+            [clj-puredata.io :refer [dir-target]]
             [clojure.string :as string]))
 
 (deftest default-usage
@@ -12,4 +13,4 @@
     (testing "writes the patch file to disk."
       (is (let [file-name "empty.pd"
                 file-contents (write-patch file-name)]
-            (= file-contents (slurp file-name)))))))
+            (= file-contents (slurp (str dir-target \/ file-name))))))))
