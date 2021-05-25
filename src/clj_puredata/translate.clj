@@ -184,7 +184,7 @@
 
 (defn- to-string
   "Stringify literals conformant to the puredata patch format.
-  E.g. formatting floats and rationals accordingly, TODO escaping
+  E.g. formatting floats and rationals accordingly, escaping
   \";\" and \"$\" characters etc."
   [elm]
   (cond
@@ -195,9 +195,10 @@
                     (integer? elm) (str elm)
                     (float? elm) (format "%f" elm)
                     (rational? elm) (to-string (float elm)))
+    (= elm "\\\\;") elm ;; ignore literal escaped semicolon, which could conceivably used e.g. to match keyname output.
     (string? elm) (-> elm
                       (string/replace #"\$" #(str \\ %))
-                      (string/replace #"[,;]" #(str " \\" %)))
+                      (string/replace #"[,;]" #(str " \\" %))) ;; TODO: replace "asdf;" different than "\\\\;"
     :else (to-string (str elm))))
 
 (defn- fill-template
