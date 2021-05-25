@@ -8,6 +8,7 @@
   - [Bang Options](#bang-options)
   - [Toggle Options](#toggle-options)
   - [Slider Options](#slider-options)
+  - [Radio Options](#radio-options)
   - [Canvas Options](#canvas-options)
 
 [Back to Index](index.md)
@@ -84,7 +85,7 @@ Supported in: `floatatom`, `symbolatom`
 | `:label-color`    | -1      |         |
 | `:size`           | 15      |         |
 
-Supported in: `bng`, `tgl`, `hsl`, `vsl`
+Supported in: `bng`, `tgl`, `hsl`, `vsl`, `hradio`, `vradio`
 
 ##### Bang Options
 
@@ -120,6 +121,16 @@ Supported in: `tgl`
 | `:steady-on-click` | 1       |                                                |
 
 Supported in: `hsl`, `vsl`
+
+##### Radio Options
+
+| option        | default | comment                       |
+|---------------|---------|-------------------------------|
+| `:init`       | 0       | does node send value on load? |
+| `:init-value` | 0       | initial value                 |
+| `:cells`      | 8       | number of cells               |
+
+Supported in: `hradio`, `vradio`
 
 ##### Canvas Options
 
