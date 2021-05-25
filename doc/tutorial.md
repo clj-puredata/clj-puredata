@@ -12,13 +12,10 @@
   - [Images](#images)
 
 Still Missing:
-- Patch Options list
-- Supported Nodes
-- Node Options list
+- write-patch, write-patch-reloading, load-patches, startup
 - Advanced Usage
   - Live Reloading
   - Recursion
-
 
 ## Creating Patches
 
@@ -28,11 +25,19 @@ A list of supported nodes can be found in [`Nodes.md`](nodes.md)
 
 ```clojure
 (write-patch "basics.pd"
-             [:-]           ; Nodes are created from hiccup, which is just plain vectors.
-                            ; The first item is always the node name, as a keyword.
-             [:+ 1 2]       ; Literals are passed as creation arguments.
-             [:msg "bang"]  ;
-             [:* [:msg 3]]) ; Nesting nodes creates connections between them.
+                              ; Nodes are created from hiccup-inspired vectors.
+                              ; (see https://github.com/weavejester/hiccup#syntax)
+             [:-]             ; The first item is always the node name, as a keyword.
+
+             [:+ 1 2]         ; Literals (numbers, strings) are passed as creation arguments.
+             [:msg "bang"]
+
+             [:* [:msg 3]]    ; Nesting nodes creates connections between them.
+
+                              ; Note these special cases:
+             ["subpatch.pd"]  ; If the first item is a string, it will render as a subpatch.
+             [:*- 1 [:osc-]]) ; Signal nodes have a `-` (dash) (instead of a `~` (tilde)) appended to their name.
+                              ; (This is because tilde has special meaning in Clojure.
 ```
 
 ![basics](img/basics.png)
@@ -40,7 +45,7 @@ A list of supported nodes can be found in [`Nodes.md`](nodes.md)
 ### Node Arguments
 
 ```clojure
-(write-patch "arguments.pd" 
+(write-patch "arguments.pd"
              [:pack "f f f" ; Argument position determines the connection inlet:
               [:msg 1]      ; Connected to first inlet.
               nil           ; `nil` skips an inlet.
@@ -143,4 +148,3 @@ These are relevant for UI nodes like Sliders, Toggles, Bangs etc., and also cont
 ```
 
 ![import-image](img/import-image.png)
-
