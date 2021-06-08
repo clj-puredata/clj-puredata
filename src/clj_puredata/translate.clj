@@ -5,6 +5,7 @@
   values from clojure maps. Also includes default values for various
   types to make sure all necessary keywords are present for filling
   the templates."
+  (:import java.util.Locale)
   (:require [clojure.string :as string]
             [clj-puredata.parse :refer [lines pd]]
             [clj-puredata.io :refer [reload-all-patches
@@ -182,6 +183,8 @@
   [defaults n]
   (assoc n :options (merge defaults (:options n))))
 
+(def fixed-locale (Locale. "en_US"))
+
 (defn- to-string
   "Stringify literals conformant to the puredata patch format.
   E.g. formatting floats and rationals accordingly, escaping
@@ -193,7 +196,7 @@
                   (string/join " " (map to-string elm)))
     (number? elm) (cond
                     (integer? elm) (str elm)
-                    (float? elm) (format "%f" elm)
+                    (float? elm) (String/format fixed-locale "%f" (into-array Object [elm])) ;; use fixed en_US locale to lock decimal separator to character "."
                     (rational? elm) (to-string (float elm)))
     (= elm "\\;") "\\\\\\;" ;; ignore literal escaped semicolon, which could conceivably used e.g. to match keyname output.
     (string? elm) (-> elm
