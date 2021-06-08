@@ -195,7 +195,7 @@
                     (integer? elm) (str elm)
                     (float? elm) (format "%f" elm)
                     (rational? elm) (to-string (float elm)))
-    (= elm "\\\\;") elm ;; ignore literal escaped semicolon, which could conceivably used e.g. to match keyname output.
+    (= elm "\\;") "\\\\\\;" ;; ignore literal escaped semicolon, which could conceivably used e.g. to match keyname output.
     (string? elm) (-> elm
                       (string/replace #"\$" #(str \\ %))
                       (string/replace #"[,;]" #(str " \\" %))) ;; TODO: replace "asdf;" different than "\\\\;"
