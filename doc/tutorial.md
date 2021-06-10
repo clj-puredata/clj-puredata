@@ -1,27 +1,57 @@
 # Tutorial
 
-- [Creating Patches](#creating-patches)
-  - [Nodes](#nodes)
-  - [Node Arguments](#node-arguments)
-  - [Options](#options)
-  - [Inlets and Outlets](#inlets-and-outlets)
-  - [Referencing Nodes](#referencing-nodes)
-  - [Connecting Nodes](#connecting-nodes)
-- [Misc](#misc)
-  - [Colors](#colors)
-  - [Images](#images)
+- [Start PureData](#start-puredata)
+- [Create Patches](#create-patches)
+- [Nodes](#nodes)
+- [Node Arguments](#node-arguments)
+- [Options](#options)
+- [Inlets and Outlets](#inlets-and-outlets)
+- [Referencing Nodes](#referencing-nodes)
+- [Connecting Nodes](#connecting-nodes)
+- [Colors](#colors)
+- [Images](#images)
 
-Still Missing:
-- write-patch, write-patch-reloading, load-patches, startup
-- Advanced Usage
-  - Live Reloading
-  - Recursion
+## Start PureData
 
-## Creating Patches
+PureData can be started by calling `startup`.
+(Make sure that the `pd` executable can be found in your `PATH`.)
+When started this way, it will automatically load a patch that establishes a connection to clj-puredata.
+You can then load patches by calling `load-patches`.
+If these patches are later updated / rewritten using `write-patch-reload`, they will automatically be reloaded in PureData as well.
 
-### Nodes
+```
+(startup) ; Start PureData.
 
-A list of supported nodes can be found in [`Nodes.md`](nodes.md)
+(startup "test.pd") ; When supplied with an argument, clj-puredata tries to load the patch immediately.
+; This will fail when PureData takes longer than 3 seconds to start. Sorry!
+
+(load-patches "test.pd")
+(load-patches "one.pd" "two.pd")
+```
+
+## Create Patches
+
+Patches are created using `write-patch` or `write-patch-reload`.
+When a patch has previously been opened in PureData using `load-patches`, then evaluating `write-patch-reload` will reload that patch in PureData automatically.
+A number of options can be supplied to customize the patch itself - see [the list of options](options.md).
+
+```
+(write-patch
+  "filename.pd" ; First argument is the patch filename.
+  {:width 300 :height 200}  ; The second argument can (optionally) be an options map.
+  
+  [:print [:float 0 [:loadbang {:name 'onLoad}]]] ; Any other arguments are treated as nodes.
+  [:msg "loading" (other 'onLoad)]
+  ...
+  )
+```
+
+## Nodes
+
+Nodes are created from vectors like `[:+ 1 2]`.
+The first element must always be a keyword like `:print` or a string like `"subpatch.pd"`.
+Signal nodes always end with a dash `-` (not a tilde `~`), like `[:osc- 440]`.
+A list of supported nodes and their names can be found in [`Nodes.md`](nodes.md)
 
 ```clojure
 (write-patch "basics.pd"
@@ -37,24 +67,30 @@ A list of supported nodes can be found in [`Nodes.md`](nodes.md)
                               ; Note these special cases:
              ["subpatch.pd"]  ; If the first item is a string, it will render as a subpatch.
              [:*- 1 [:osc-]]) ; Signal nodes have a `-` (dash) (instead of a `~` (tilde)) appended to their name.
-                              ; (This is because tilde has special meaning in Clojure.
+                              ; (This is because tilde has special meaning in Clojure.)
 ```
 
 ![basics](img/basics.png)
 
-### Node Arguments
+## Node Arguments
+
+Inside a node vector, everything that isn't the first item, or an options map as the second item, is treated as an argument.
+If the argument is a literal number or string, those are used verbatim.
+If the argument is another node, a connection is formed.
+For nodes, the position of arguments determines the target inlet (unless otherwise specified using `inlet`).
 
 ```clojure
 (write-patch "arguments.pd"
-             [:pack "f f f" ; Argument position determines the connection inlet:
-              [:msg 1]      ; Connected to first inlet.
-              nil           ; `nil` skips an inlet.
-              [:msg 3]])    ; Connected to third inlet.
+             [:pack \f \f ; Argument position determines the connection inlet:
+              [:msg 1]    ; Connected to first inlet.
+              nil         ; `nil` skips an inlet.
+              \f          ; Literals don't influence inlet count and are concatenated regardless of position.
+              [:msg 3]])  ; Connected to third inlet.
 ```
 
 ![arguments](img/arguments.png)
 
-### Options
+## Options
 
 Options can be passed as the second argument to both Nodes (through hiccup) and Patches (through `write-patch` etc.).
 You can find a list of supported options in the [List of supported Options](options.md).
@@ -73,7 +109,9 @@ These are relevant for UI nodes like Sliders, Toggles, Bangs etc., and also cont
 
 ![options](img/options.png)
 
-### Inlets and Outlets
+## Inlets and Outlets
+
+To specify which inlet or outlet two nodes connect on, use the `inlet` and `outlet` functions.
 
 ```clojure
 (write-patch "inlet-and-outlet.pd"
@@ -86,7 +124,10 @@ These are relevant for UI nodes like Sliders, Toggles, Bangs etc., and also cont
 
 ![inlet and outlet](img/inlet-and-outlet.png)
 
-### Referencing Nodes
+## Referencing Nodes
+
+TODO: show how `let` and `pd` can be used to reference nodes.
+
 
 ```clojure
 (write-patch "other.pd"
@@ -95,28 +136,30 @@ These are relevant for UI nodes like Sliders, Toggles, Bangs etc., and also cont
              [:print "zero" (other 'm)]                   ; The named Node can be defined later, too.
              [:print "one or more" (outlet (other 'm) 1)] ; `inlet` and `outlet` also work with `other`.
              [:moses {:name 'm} 1])
+
 ```
 
 ![other](img/other.png)
 
-### Connecting Nodes
+## Connecting Nodes
 
 ```clojure
 (write-patch "connect.pd"
-             (connect [:loadbang] [:print "hello world!"])    ; Use `connect` to connect nodes explicitly.
-             (connect [:moses] 1 [:pack] 1)                   ; Use 4 arguments to specify inlet and outlet ...
-             (connect (outlet (inlet [:select] 1) 1) [:pack]) ; ... or use `inlet` and `outlet`.
-                                                              ; Note: they are used on the originating node.
+             (connect [:loadbang] [:print "hello world!"]) ; Use `connect` to connect nodes explicitly.
+             (connect [:moses] 1 [:pack] 1)                ; Use 4 arguments to specify inlet and outlet ...
+             (connect (-> [:select]                        ; ... or use `inlet` and `outlet` explicitly.
+                          (inlet 1)                        ; Note: they are used on the originating node.
+                          (outlet 1))
+                      [:pack]) 
+
              [:msg {:name 'tik} "bang"]
              [:metro {:name 'tok} 200]
-             (connect (other 'tik) (other 'tok)))             ; It works fine with `other` as well.
+             (connect (other 'tik) (other 'tok)))          ; It works fine with `other` as well.
 ```
 
 ![connect](img/connect.png)
 
-## Misc
-
-### Colors
+## Colors
 
 ```clojure
 (let [hues 32
@@ -140,7 +183,7 @@ These are relevant for UI nodes like Sliders, Toggles, Bangs etc., and also cont
 
 ![colors](img/colors.png)
 
-### Images
+## Images
 
 ```clojure
 (write-patch "smilie.pd"

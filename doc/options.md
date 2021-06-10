@@ -117,7 +117,7 @@ Supported in: `tgl`
 | `:top`             | 127     | maximum value                                  |
 | `:log`             | 0       |                                                |
 | `:init`            | 0       | is node value initialized when patch is loaded |
-| `:default`         | 0       | saved slider position, in pixels.              |
+| `:default`         | 0       | saved slider position, in 1/100th of pixels.   |
 | `:steady-on-click` | 1       |                                                |
 
 Supported in: `hsl`, `vsl`

@@ -1,15 +1,28 @@
 # clj-puredata
 
-clj-puredata generates [PureData](https://puredata.info/) patches using [Clojure](https://clojure.org/).
-It supports live reloading, has a simple layouter that automatically arranges the generated patches
+clj-puredata is a [Clojure](https://clojure.org/) library for generating [PureData](https://puredata.info/) patches.
+It features:
 
-Check the [documentation](doc/index.md), especially the [Tutorial](doc/tutorial.md).
+- live coding / reloading
+- automatic patch layouts
+- support for many puredata-nodes
+- increased quality of life
 
 ## Installation
 
-Using Leiningen/Boot: `[clj-puredata "0.2.0-SNAPSHOT"]`
+Add the following to your `:dependencies`:
 
-## Usage
+```
+[clj-puredata "0.3.2-SNAPSHOT"]
+```
+
+## Documentation
+
+- [Tutorial](doc/tutorial.md)
+- [Full Documentation Index](doc/index.md)
+- API Docs (ToDo)
+
+## Quick Start
 
 This will create a `counter.pd` patch, use it in a `usage.pd` patch, and start PureData with that patch.
 Whenever you change and re-evaluage the `write-patch-reload` form, the patch will be updated in PureData as well.
