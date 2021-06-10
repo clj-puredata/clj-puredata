@@ -50,6 +50,23 @@ Check the [Documentation](doc/intro.md), especially the [Tutorial](doc/tutorial.
 
 ## Roadmap
 
+- [x] add support for radio ui nodes
+  - [ ] find out what the constant "1" in the `radio-nodes` template is used for
+  [ ] check changes in file format for version >48
+    [ ] find out what trailing `, f N` means for nodes (appears to set width to N on some nodes)
+- [ ] subpatches (needs multiple parsing contexts? e.g. map of context instead of single atom)
+- [ ] layouter should sort node arguments by inlet number (instead of argument position)
+- [ ] add support for `:left`, `:right`, `:first`, `:second`, etc. as arguments to `inlet` or `outlet`
+  (q: how? some nodes have variable # of inlets/outlets)
+- [ ] make layout engine ignore any nodes that have :x or :y set (also ignore them when setting column widths or offsets).
+)
+- [ ] fix bug in layouter where two nodes can occupy the same position
+- [ ] fix behavior in layouter where any completely circular part of a patch is pushed into the top-left corner and not layouted correctly.
+- [ ] add optional arguments `:inlet`, `:outlet` to `other` -- `(other 'ref :inlet 0 :outlet 1)`
+- [ ] add helper `in-out-lets` that can supply both `:inlet` and `:outlet` in one call?
+
+## Changelog
+
 - [x] live reloading of newly generated patches into PureData
 - [x] parsing hiccup syntax.
 - [x] writing of PureData patch format.
@@ -62,25 +79,14 @@ Check the [Documentation](doc/intro.md), especially the [Tutorial](doc/tutorial.
 - [x] remove the need for explicit PD anywhere - make it implicit in WITH-PATCH, INLET, OUTLET, OTHER.
 - [x] DEBUG: do `inlet` and `outlet` work on `other`???
 - [x] `connect` function & supporting data structure for adding connections after node creation
-- [x] add support for radio ui nodes
-  - [ ] find out what the constant "1" in the `radio-nodes` template is used for
 - [x] make `write-patch-reload` return file string as well.
 - [x] helpers for coloring ui-nodes (copy from cl-pd)
 - [x] Redo Tutorial for Options, use UI node with Colors for demonstration
 - [x] expand resources into separate directory (e.g. `helper-patches`) instead of `./` root.
 - [x] put generated patches into a `patch` subdirectory instead of `./` root.
 - [x] add image-to-patch functionality.
-- [ ] subpatches (needs multiple parsing contexts? e.g. map of context instead of single atom)
-- [ ] layouter should sort node arguments by inlet number (instead of argument position)
-- [ ] add support for `:left`, `:right`, `:first`, `:second`, etc. as arguments to `inlet` or `outlet`
-  (q: how? some nodes have variable # of inlets/outlets)
-- [ ] make layout engine ignore any nodes that have :x or :y set (also ignore them when setting column widths or offsets).
-- [ ] clarify gotchas like the use of dashes in signal-nodes like `[:+-]`
-- [x] fix bug in layouter that calculates node size of messages wrong (workaround: limit at 25 characters node size)
-- [ ] fix bug in layouter where two nodes can occupy the same position
-- [ ] fix behavior in layouter where any completely circular part of a patch is pushed into the top-left corner and not layouted correctly.
-- [ ] add optional arguments `:inlet`, `:outlet` to `other` -- `(other 'ref :inlet 0 :outlet 1)`
-- [ ] add helper `in-out-lets` that can supply both `:inlet` and `:outlet` in one call?
+- [x] clarify gotchas like the use of dashes in signal-nodes like `[:+-]`
+- [x] fix bug in layouter that calculates node size of messages wrong (workaround: limit at 25 characters node size
 
 ## License
 
