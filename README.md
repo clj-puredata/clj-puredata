@@ -13,7 +13,7 @@ It features:
 Add the following to your `:dependencies`:
 
 ```
-[clj-puredata "0.3.2-SNAPSHOT"]
+[clj-puredata "0.3.2"]
 ```
 
 ## Documentation
