@@ -19,7 +19,7 @@ When started this way, it will automatically load a patch that establishes a con
 You can then load patches by calling `load-patches`.
 If these patches are later updated / rewritten using `write-patch-reload`, they will automatically be reloaded in PureData as well.
 
-```
+```clojure
 (startup) ; Start PureData.
 
 (startup "test.pd") ; When supplied with an argument, clj-puredata tries to load the patch immediately.
@@ -35,10 +35,10 @@ Patches are created using `write-patch` or `write-patch-reload`.
 When a patch has previously been opened in PureData using `load-patches`, then evaluating `write-patch-reload` will reload that patch in PureData automatically.
 A number of options can be supplied to customize the patch itself - see [the list of options](options.md).
 
-```
+```clojure
 (write-patch
-  "filename.pd" ; First argument is the patch filename.
-  {:width 300 :height 200}  ; The second argument can (optionally) be an options map.
+  "filename.pd"                                   ; First argument is the patch filename.
+  {:width 300 :height 200}                        ; The second argument can (optionally) be an options map.
   
   [:print [:float 0 [:loadbang {:name 'onLoad}]]] ; Any other arguments are treated as nodes.
   [:msg "loading" (other 'onLoad)]
