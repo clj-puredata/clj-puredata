@@ -1,6 +1,6 @@
 # Types and Data Structures
 
-[Back to Index](index.md)
+[Back to Index](file-index.md)
 
 ## Table of Contents
 

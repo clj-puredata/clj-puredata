@@ -11,7 +11,7 @@
   - [Radio Options](#radio-options)
   - [Canvas Options](#canvas-options)
 
-[Back to Index](index.md)
+[Back to Index](file-index.md)
 
 ## Patch Options
 

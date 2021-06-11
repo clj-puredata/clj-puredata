@@ -18,8 +18,9 @@ Add the following to your `:dependencies`:
 
 ## Documentation
 
+- [Homepage](https://clj-puredata.github.io/clj-puredata/)
 - [Tutorial](docs/tutorial.md)
-- [Full Documentation Index](docs/index.md)
+- [Full Documentation Index](docs/file-index.md)
 - API Docs (ToDo)
 
 ## Quick Start
@@ -45,7 +46,7 @@ Whenever you change and re-evaluage the `write-patch-reload` form, the patch wil
 (startup "usage.pd")
 ```
 
-Check the [Documentation](docs/intro.md), especially the [Tutorial](docs/tutorial.md).
+Check the [Tutorial](docs/tutorial.md) as well.
 
 
 ## Roadmap
