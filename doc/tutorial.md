@@ -20,13 +20,13 @@ You can then load patches by calling `load-patches`.
 If these patches are later updated / rewritten using `write-patch-reload`, they will automatically be reloaded in PureData as well.
 
 ```clojure
-(startup) ; Start PureData.
+(startup)                        ; Start PureData.
 
-(startup "test.pd") ; When supplied with an argument, clj-puredata tries to load the patch immediately.
-; This will fail when PureData takes longer than 3 seconds to start. Sorry!
+(startup "test.pd")              ; When supplied with an argument, clj-puredata tries to load the patch immediately.
+                                 ; This will fail when PureData takes longer than 3 seconds to start. Sorry!
 
-(load-patches "test.pd")
-(load-patches "one.pd" "two.pd")
+(load-patches "test.pd")         ; This is another way to load one or multiple patches.
+(load-patches "one.pd" "two.pd") ; etc.
 ```
 
 ## Create Patches
