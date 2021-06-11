@@ -18,8 +18,8 @@ Add the following to your `:dependencies`:
 
 ## Documentation
 
-- [Tutorial](doc/tutorial.md)
-- [Full Documentation Index](doc/index.md)
+- [Tutorial](docs/tutorial.md)
+- [Full Documentation Index](docs/index.md)
 - API Docs (ToDo)
 
 ## Quick Start
@@ -45,7 +45,7 @@ Whenever you change and re-evaluage the `write-patch-reload` form, the patch wil
 (startup "usage.pd")
 ```
 
-Check the [Documentation](doc/intro.md), especially the [Tutorial](doc/tutorial.md).
+Check the [Documentation](docs/intro.md), especially the [Tutorial](docs/tutorial.md).
 
 
 ## Roadmap
