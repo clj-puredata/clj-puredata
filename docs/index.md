@@ -1,31 +1,11 @@
 # clj-puredata
 
 clj-puredata is a [Clojure](https://clojure.org/) library for generating [PureData](https://puredata.info/) patches.
-It features:
-
-- live coding / reloading
-- automatic patch layouts
-- support for many puredata-nodes
-- increased quality of life
-
-## Installation
-
-Add the following to your `:dependencies`:
-
-```
-[clj-puredata "0.3.2"]
-```
-
-## Documentation
-
-- [Tutorial](tutorial.md)
-- [Full Documentation Index](file-index.md)
-- API Docs (ToDo)
 
 ## Quick Start
 
 This will create a `counter.pd` patch, use it in a `usage.pd` patch, and start PureData with that patch.
-Whenever you change and re-evaluage the `write-patch-reload` form, the patch will be updated in PureData as well.
+Whenever you change and re-evaluate the `write-patch-reload` form, the patch will be updated in PureData as well.
 
 ```clojure
 (ns example.core
@@ -45,8 +25,41 @@ Whenever you change and re-evaluage the `write-patch-reload` form, the patch wil
 (startup "usage.pd")
 ```
 
-Check the [Tutorial](tutorial.md) as well.
+## Features:
 
+- Supports most vanilla nodes
+- Supports live coding (by reloading changed patches)
+- Automatic patch layouter for node placement
+
+### Why use it?
+
+- Batch-operations on many nodes are done very quickly.
+- Variations can be automatically created, in large numbers, in little time.
+- UIs can be layouted algorithmically, without the hassle of manual pixel-perfect adjustments.
+- The automatic layouter works okay for most simple patches.
+- Less clicking, more typing.
+
+### Why NOT use it?
+
+- Requires basic knowledge of Clojure.
+- Requires solid knowledge of PureData node names, their inputs and outputs; there are no helpers for that yet.
+- Patches are hard to reason about in code, without the visual aid.
+- The automatic layouter is kind of primitive and produces bad results in complex patches.
+- Less clicking, more typing.
+
+## Installation
+
+Add the following to your `:dependencies`:
+
+```
+[clj-puredata "0.3.2"]
+```
+
+## Documentation
+
+- [Tutorial](tutorial.md)
+- [Full Documentation Index](file-index.md)
+- API Docs (ToDo)
 
 ## Roadmap
 
@@ -64,6 +77,7 @@ Check the [Tutorial](tutorial.md) as well.
 - [ ] fix behavior in layouter where any completely circular part of a patch is pushed into the top-left corner and not layouted correctly.
 - [ ] add optional arguments `:inlet`, `:outlet` to `other` -- `(other 'ref :inlet 0 :outlet 1)`
 - [ ] add helper `in-out-lets` that can supply both `:inlet` and `:outlet` in one call?
+- [ ] for consistency, rename `other` to `ref` and use node options key `:ref` instead of `:name` to reference other nodes.
 
 ## Changelog
 
@@ -87,6 +101,10 @@ Check the [Tutorial](tutorial.md) as well.
 - [x] add image-to-patch functionality.
 - [x] clarify gotchas like the use of dashes in signal-nodes like `[:+-]`
 - [x] fix bug in layouter that calculates node size of messages wrong (workaround: limit at 25 characters node size
+
+## Attribution
+
+This library uses [osc-clj](https://github.com/overtone/osc-clj), which is part of [overtone](https://github.com/overtone/overtone).
 
 ## License
 
