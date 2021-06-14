@@ -2,6 +2,8 @@
 
 clj-puredata is a [Clojure](https://clojure.org/) library for generating [PureData](https://puredata.info/) patches.
 
+Visit the [Homepage](https://clj-puredata.github.io/clj-puredata/) or the [Documentation](docs/index.md) for more info.
+
 ## Quick Start
 
 This will create a `counter.pd` patch, use it in a `usage.pd` patch, and start PureData with that patch.
@@ -24,5 +26,3 @@ Whenever you change and re-evaluate the `write-patch-reload` form, the patch wil
 
 (startup "usage.pd")
 ```
-
-Visit the [Homepage](https://clj-puredata.github.io/clj-puredata/) or the [Documentation](docs/index.md)
