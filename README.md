@@ -1,12 +1,28 @@
 # clj-puredata
 
 clj-puredata is a [Clojure](https://clojure.org/) library for generating [PureData](https://puredata.info/) patches.
-It features:
 
-- live coding / reloading
-- automatic patch layouts
-- support for many puredata-nodes
-- increased quality of life
+### Features:
+
+- Supports most vanilla nodes
+- Supports live coding (by reloading changed patches)
+- Automatic patch layouter for node placement
+
+### Why use it?
+
+- Batch-operations on many nodes are done very quickly.
+- Variations can be automatically created, in large numbers, in little time.
+- UIs can be layouted algorithmically, without the hassle of manual pixel-perfect adjustments.
+- The automatic layouter works okay for most simple patches.
+- Less clicking, more typing.
+
+### Why NOT use it?
+
+- Requires basic knowledge of Clojure.
+- Requires solid knowledge of PureData node names, their inputs and outputs; there are no helpers for that yet.
+- Patches are hard to reason about in code, without the visual aid.
+- The automatic layouter is kind of primitive and produces bad results in complex patches.
+- Less clicking, more typing.
 
 ## Installation
 
