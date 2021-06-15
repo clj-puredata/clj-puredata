@@ -297,7 +297,7 @@
   [patch lines]
   (let [{:keys [graph-on-parent subpatch]} patch
         ;;
-        header-keys (select-keys patch [:x :y :width :height])
+        header-keys (select-keys patch [:x :y :width :height :font-size])
         footer-keys (-> patch
                         (select-keys [:graph-on-parent :hide-object-name
                                       :x-range-min :y-range-min
