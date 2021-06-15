@@ -23,6 +23,7 @@ These options are supported as the second argument to `write-patch`, `write-patc
 | `:y`                | 0       | window position, vertical    |
 | `:width`            | 450     | window width                 |
 | `:height`           | 300     | window height                |
+| `:font-size`        | 12      | font size                    |
 | `:graph-on-parent`  | false   |                              |
 | `:hide-object-name` | false   |                              |
 | `:view-width`       | 85      | width of visible graph area  |

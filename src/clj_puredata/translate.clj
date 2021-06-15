@@ -24,7 +24,7 @@
     "dac~" "adc~" "sig~" "line~" "vline~" "threshold~" "snapshot~" "vsnapshot~" "bang~" "samplerate~" "send~" "receive~" "throw~" "catch~" "block~" "switch~" "readsf~" "writesf~" ; audio manipulation
     "phasor~" "cos~" "osc~" "tabwrite~" "tabplay~" "tabread~" "tabread4~" "tabosc4~" "tabsend~" "tabreceive~" ; audio oscillators and tables
     "vcf~" "noise~" "env~" "hip~" "lop~" "bp~" "biquad~" "samphold~" "print~" "rpole~" "rzero~" "rzero_rev~" "cpole~" "czero~" "czero_rev~" ; audio filters
-    "delwrite~" "delread~" "vd~"                     ; audio delay
+    "delwrite~" "delread~" "vd~" ; audio delay
     ;; pd
     "inlet" "outlet" "inlet~" "outlet~" ; subwindows
     "struct" "drawcurve" "filledcurve" "drawpolygon" "filledpolygon" "plot" "drawnumber" ; data templates
@@ -153,6 +153,7 @@
    :y 0
    :width 450
    :height 300
+   :font-size 12
    ;; graph properties
    :graph-on-parent false
    :hide-object-name false
@@ -166,8 +167,7 @@
    :y-range-max -1})
 
 (def patch-header-template ["#N" "canvas"
-                            :x :y :width :height
-                            10])
+                            :x :y :width :height :font-size])
 
 (def patch-footer-template ["#X" "coords"
                             :x-range-min :y-range-min
